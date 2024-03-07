@@ -1,5 +1,7 @@
 plugins {
+    idea
     `java-gradle-plugin`
+    `jvm-test-suite`
     alias(libs.plugins.jvm)
     alias(libs.plugins.detekt)
 }
@@ -10,8 +12,6 @@ repositories {
 
 dependencies {
     detektPlugins(libs.detekt.ktlint)
-    testImplementation(libs.kotlin.junit5)
-    testImplementation(libs.junit.platform.launcher)
 }
 
 gradlePlugin {
@@ -21,24 +21,33 @@ gradlePlugin {
     }
 }
 
-val functionalTestSourceSet = sourceSets.create("functionalTest") {
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter()
+            dependencies {
+                implementation(libs.kotlin.junit5)
+                runtimeOnly(libs.junit.platform.launcher)
+            }
+        }
+
+        val functionalTest by registering(JvmTestSuite::class) {
+            useJUnitJupiter()
+
+            configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
+            configurations["functionalTestRuntimeOnly"].extendsFrom(configurations["testRuntimeOnly"])
+
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
 }
-
-configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
-configurations["functionalTestRuntimeOnly"].extendsFrom(configurations["testRuntimeOnly"])
-
-val functionalTest by tasks.registering(Test::class) {
-    testClassesDirs = functionalTestSourceSet.output.classesDirs
-    classpath = functionalTestSourceSet.runtimeClasspath
-    useJUnitPlatform()
-}
-
-gradlePlugin.testSourceSets.add(functionalTestSourceSet)
 
 tasks.named<Task>("check") {
-    dependsOn(functionalTest)
-}
-
-tasks.named<Test>("test") {
-    useJUnitPlatform()
+    dependsOn(testing.suites.named("functionalTest"))
 }
