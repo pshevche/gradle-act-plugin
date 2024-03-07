@@ -1,10 +1,13 @@
-# https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 [versions]
 detekt = "1.23.5"
+kotlin = "1.9.20"
+junit-platform = "1.10.2"
 
 [plugins]
-jvm = { id = "org.jetbrains.kotlin.jvm", version = "1.9.20" }
+jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
 [libraries]
 detekt-ktlint = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
+kotlin-junit5 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "kotlin" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit-platform"}

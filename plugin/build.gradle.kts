@@ -10,8 +10,8 @@ repositories {
 
 dependencies {
     detektPlugins(libs.detekt.ktlint)
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(libs.kotlin.junit5)
+    testImplementation(libs.junit.platform.launcher)
 }
 
 gradlePlugin {
