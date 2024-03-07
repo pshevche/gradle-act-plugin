@@ -1,4 +1,10 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
+[versions]
+detekt = "1.23.5"
 
 [plugins]
 jvm = { id = "org.jetbrains.kotlin.jvm", version = "1.9.20" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+
+[libraries]
+detekt-ktlint = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }

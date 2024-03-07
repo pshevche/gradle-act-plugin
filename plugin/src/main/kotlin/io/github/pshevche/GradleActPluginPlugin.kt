@@ -1,9 +1,9 @@
 package io.github.pshevche
 
-import org.gradle.api.Project
 import org.gradle.api.Plugin
+import org.gradle.api.Project
 
-class GradleActPluginPlugin: Plugin<Project> {
+class GradleActPluginPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.tasks.register("greeting") { task ->
             task.doLast {

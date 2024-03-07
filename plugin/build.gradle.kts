@@ -1,6 +1,7 @@
 plugins {
     `java-gradle-plugin`
     alias(libs.plugins.jvm)
+    alias(libs.plugins.detekt)
 }
 
 repositories {
@@ -8,6 +9,7 @@ repositories {
 }
 
 dependencies {
+    detektPlugins(libs.detekt.ktlint)
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
