@@ -26,8 +26,8 @@ testing {
         val test by getting(JvmTestSuite::class) {
             useJUnitJupiter()
             dependencies {
-                implementation(libs.kotlin.junit5)
-                runtimeOnly(libs.junit.platform.launcher)
+                implementation(libs.kotest.runner)
+                implementation(libs.kotest.assertions)
             }
         }
 

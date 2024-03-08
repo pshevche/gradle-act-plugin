@@ -1,20 +1,17 @@
 package io.github.pshevche
 
-import java.io.File
-import kotlin.test.assertTrue
-import kotlin.test.Test
+import io.kotest.core.spec.style.FreeSpec
+import io.kotest.engine.spec.tempdir
+import io.kotest.matchers.string.shouldContain
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.jupiter.api.io.TempDir
 
-class GradleActPluginPluginFunctionalTest {
+class GradleActPluginPluginFunctionalTest : FreeSpec({
 
-    @field:TempDir
-    lateinit var projectDir: File
+    val projectDir = tempdir()
+    val buildFile by lazy { projectDir.resolve("build.gradle") }
+    val settingsFile by lazy { projectDir.resolve("settings.gradle") }
 
-    private val buildFile by lazy { projectDir.resolve("build.gradle") }
-    private val settingsFile by lazy { projectDir.resolve("settings.gradle") }
-
-    @Test fun `can run task`() {
+    "can run task" {
         settingsFile.writeText("")
         buildFile.writeText("""
             plugins {
@@ -29,6 +26,6 @@ class GradleActPluginPluginFunctionalTest {
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
-        assertTrue(result.output.contains("Hello from plugin 'io.github.pshevche.greeting'"))
+        result.output shouldContain "Hello from plugin 'io.github.pshevche.greeting'"
     }
-}
+})

@@ -1,13 +1,14 @@
 package io.github.pshevche
 
+import io.kotest.core.spec.style.FreeSpec
+import io.kotest.matchers.shouldNotBe
 import org.gradle.testfixtures.ProjectBuilder
-import kotlin.test.Test
-import kotlin.test.assertNotNull
 
-class GradleActPluginPluginTest {
-    @Test fun `plugin registers task`() {
+class GradleActPluginPluginTest : FreeSpec({
+
+    "plugin registers task" {
         val project = ProjectBuilder.builder().build()
         project.plugins.apply("io.github.pshevche.greeting")
-        assertNotNull(project.tasks.findByName("greeting"))
+        project.tasks.findByName("greeting") shouldNotBe null
     }
-}
+})
