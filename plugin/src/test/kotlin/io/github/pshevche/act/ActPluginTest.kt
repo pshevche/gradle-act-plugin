@@ -4,11 +4,11 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldNotBe
 import org.gradle.testfixtures.ProjectBuilder
 
-class GradleActPluginPluginTest : FreeSpec({
+class ActPluginTest : FreeSpec({
 
     "plugin registers task" {
         val project = ProjectBuilder.builder().build()
-        project.plugins.apply("io.github.pshevche.greeting")
+        project.plugins.apply("io.github.pshevche.act")
         project.tasks.findByName("greeting") shouldNotBe null
     }
 })

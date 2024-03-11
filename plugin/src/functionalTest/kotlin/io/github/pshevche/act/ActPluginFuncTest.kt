@@ -5,7 +5,7 @@ import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.string.shouldContain
 import org.gradle.testkit.runner.GradleRunner
 
-class GradleActPluginPluginFunctionalTest : FreeSpec({
+class ActPluginFuncTest : FreeSpec({
 
     val projectDir = tempdir()
     val buildFile by lazy { projectDir.resolve("build.gradle") }
@@ -15,7 +15,7 @@ class GradleActPluginPluginFunctionalTest : FreeSpec({
         settingsFile.writeText("")
         buildFile.writeText("""
             plugins {
-                id('io.github.pshevche.greeting')
+                id('io.github.pshevche.act')
             }
         """.trimIndent())
 
@@ -26,6 +26,6 @@ class GradleActPluginPluginFunctionalTest : FreeSpec({
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
-        result.output shouldContain "Hello from plugin 'io.github.pshevche.greeting'"
+        result.output shouldContain "Hello from plugin 'io.github.pshevche.act'"
     }
 })
