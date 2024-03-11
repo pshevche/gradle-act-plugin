@@ -17,7 +17,7 @@ dependencies {
 gradlePlugin {
     val greeting by plugins.creating {
         id = "io.github.pshevche.greeting"
-        implementationClass = "io.github.pshevche.GradleActPluginPlugin"
+        implementationClass = "io.github.pshevche.act.GradleActPluginPlugin"
     }
 }
 

@@ -1,4 +1,4 @@
-package io.github.pshevche
+package io.github.pshevche.act
 
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.engine.spec.tempdir
