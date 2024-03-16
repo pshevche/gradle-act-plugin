@@ -1,7 +1,7 @@
 [versions]
 detekt = "1.23.5"
 kotest = "5.8.0"
-kotlin = "1.9.20"
+kotlin = "1.9.23"
 
 [plugins]
 jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
