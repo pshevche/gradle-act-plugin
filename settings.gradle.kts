@@ -1,2 +1,2 @@
-rootProject.name = "act-plugin"
-include("gradle-plugin")
+rootProject.name = "gradle-act-plugin"
+include("plugin")
