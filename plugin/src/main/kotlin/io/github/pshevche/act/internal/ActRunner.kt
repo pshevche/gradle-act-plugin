@@ -13,7 +13,7 @@ class ActRunner : ActConfigBuilder() {
             .waitFor()
 
         if (result != 0) {
-            throw ActPluginException("Failed to invoke act: exit code $result")
+            throw ActPluginException("Failed to invoke act command ${cmd()}: exit code $result")
         }
     }
 
@@ -21,6 +21,7 @@ class ActRunner : ActConfigBuilder() {
         add("act")
         add("--workflows")
         add(workflows!!.path)
+        addAll(additionalArgs)
     }
 
     private fun Process.forwardOutput(): Process {
