@@ -6,13 +6,14 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.string.shouldContain
 
-class ActPluginFuncTest : FreeSpec({
+class ActExecFuncTest : FreeSpec({
 
     val workspace = extension(Workspace(tempdir()))
     val runner = BuildRunner(workspace)
 
     "can run task" {
-        val result = runner.build("greeting")
-        result.output shouldContain "Hello from plugin 'io.github.pshevche.act'"
+        workspace.execTask("actExec")
+        val result = runner.build("actExec")
+        result.output shouldContain "Hello, World!"
     }
 })
