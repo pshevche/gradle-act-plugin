@@ -1,0 +1,9 @@
+name: Hello World
+on: [ push ]
+
+jobs:
+  print_greeting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Greet the world
+        run: echo "Hello, World!"
