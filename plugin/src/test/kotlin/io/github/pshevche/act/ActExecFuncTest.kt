@@ -6,6 +6,8 @@ import io.github.pshevche.act.fixtures.BuildRunner
 import io.github.pshevche.act.fixtures.Workspace
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.engine.spec.tempdir
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 
 class ActExecFuncTest : FreeSpec({
 
@@ -57,5 +59,20 @@ class ActExecFuncTest : FreeSpec({
         result = runner.build("actAll")
         result.shouldSucceed(":actAll")
         result.shouldRunJobs("print_greeting")
+    }
+
+    "allows passing arbitrary additional arguments to act" {
+        workspace.addWorkflows("workflows/", "hello_world", "goodbye_world")
+        workspace.execTask("actList") {
+            workflows(workspace.dir.resolve("workflows/hello_world.yml"))
+            additionalArgs("--list")
+        }
+
+        val result = runner.build("actList", "--stacktrace")
+
+        result.shouldSucceed(":actList")
+        result.output shouldContain "Workflow file"
+        result.output shouldContain "hello_world.yml"
+        result.output shouldNotContain "goodbye_world.yml"
     }
 })

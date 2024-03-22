@@ -8,7 +8,18 @@ class ActExecTaskBuilder : ActConfigBuilder() {
         val taskConfigBuilder = StringBuilder()
 
         if (workflows != null) {
-            taskConfigBuilder.append("workflows = file('${workflows!!.path}')")
+            taskConfigBuilder.append("workflows = file('${workflows!!.path}')\n")
+        }
+
+        if (additionalArgs.isNotEmpty()) {
+            taskConfigBuilder.append(
+                "additionalArgs = [${
+                    additionalArgs.joinToString(
+                        separator = ", ",
+                        transform = { "'$it'" }
+                    )
+                }]\n"
+            )
         }
 
         return taskConfigBuilder.toString()
