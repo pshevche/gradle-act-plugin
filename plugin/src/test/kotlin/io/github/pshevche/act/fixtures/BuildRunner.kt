@@ -1,4 +1,4 @@
-package io.github.pshevche.act.extensions
+package io.github.pshevche.act.fixtures
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
