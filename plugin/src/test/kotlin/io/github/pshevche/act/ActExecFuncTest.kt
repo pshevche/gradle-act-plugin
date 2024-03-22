@@ -25,29 +25,40 @@ class ActExecFuncTest : FreeSpec({
 
     "runs workflows in the default location" {
         workspace.addWorkflows(".github/workflows/", "hello_world", "goodbye_world")
-        workspace.execTask("actHelloWorld")
+        workspace.execTask("actAll")
 
-        val result = runner.build("actHelloWorld")
-        succeeded(result, ":actHelloWorld", listOf("print_greeting", "print_farewell"))
+        val result = runner.build("actAll")
+        succeeded(result, ":actAll", listOf("print_greeting", "print_farewell"))
     }
 
     "supports overriding the location of workflow files" {
         workspace.addWorkflows("custom-workflows/", "hello_world")
-        workspace.execTask("actHelloWorld") {
+        workspace.execTask("actCustom") {
             workflows(workspace.dir.resolve("custom-workflows"))
         }
 
-        val result = runner.build("actHelloWorld")
-        succeeded(result, ":actHelloWorld", listOf("print_greeting"))
+        val result = runner.build("actCustom")
+        succeeded(result, ":actCustom", listOf("print_greeting"))
     }
 
     "supports running a single workflow" {
         workspace.addWorkflows("custom-workflows/", "hello_world", "goodbye_world")
-        workspace.execTask("actHelloWorld") {
+        workspace.execTask("actSingle") {
             workflows(workspace.dir.resolve("custom-workflows/hello_world.yml"))
         }
 
-        val result = runner.build("actHelloWorld")
-        succeeded(result, ":actHelloWorld", listOf("print_greeting"))
+        val result = runner.build("actSingle")
+        succeeded(result, ":actSingle", listOf("print_greeting"))
+    }
+
+    "is never up-to-date" {
+        workspace.addWorkflows(".github/workflows/", "hello_world")
+        workspace.execTask("actAll")
+
+        var result = runner.build("actAll")
+        succeeded(result, ":actAll", listOf("print_greeting"))
+
+        result = runner.build("actAll")
+        succeeded(result, ":actAll", listOf("print_greeting"))
     }
 })
