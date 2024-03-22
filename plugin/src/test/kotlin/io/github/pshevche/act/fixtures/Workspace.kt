@@ -21,10 +21,12 @@ class Workspace(val dir: File) : BeforeTestListener {
         )
     }
 
-    fun addWorkflow(workspaceDir: String, workflowName: String) {
-        val workflowFile = dir.resolve(workspaceDir).resolve("$workflowName.yml")
-        Files.createParentDirs(workflowFile)
-        copyWorkflowContent(workflowFile, workflowName)
+    fun addWorkflows(workspaceDir: String, vararg workflowNames: String) {
+        workflowNames.forEach { workflowName ->
+            val workflowFile = dir.resolve(workspaceDir).resolve("$workflowName.yml")
+            Files.createParentDirs(workflowFile)
+            copyWorkflowContent(workflowFile, workflowName)
+        }
     }
 
     private fun copyWorkflowContent(workflowFile: File, workflowName: String) {

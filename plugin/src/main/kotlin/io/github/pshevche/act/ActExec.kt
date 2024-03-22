@@ -2,25 +2,26 @@ package io.github.pshevche.act
 
 import io.github.pshevche.act.internal.ActRunner
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 
 abstract class ActExec : DefaultTask() {
 
-    @get:InputDirectory
+    @get:Input
     @get:Optional
-    val workflows: DirectoryProperty = project.objects.directoryProperty()
+    abstract val workflows: Property<File>
 
     init {
-        workflows.convention(project.layout.projectDirectory.dir(".github/workflows"))
+        workflows.convention(project.layout.projectDirectory.dir(".github/workflows").asFile)
     }
 
     @TaskAction
     fun exec() {
         val runner = ActRunner()
-        runner.workflows(workflows.get().asFile.toPath())
+        runner.workflows(workflows.get())
         runner.exec()
     }
 }
