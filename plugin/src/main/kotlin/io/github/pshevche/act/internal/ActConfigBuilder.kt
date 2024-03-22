@@ -1,12 +1,12 @@
 package io.github.pshevche.act.internal
 
-import java.nio.file.Path
+import java.io.File
 
 abstract class ActConfigBuilder {
 
-    var workflows: Path? = null
+    var workflows: File? = null
 
-    fun workflows(workflows: Path): ActConfigBuilder {
+    fun workflows(workflows: File): ActConfigBuilder {
         this.workflows = workflows
         return this
     }

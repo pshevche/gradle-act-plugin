@@ -1,0 +1,9 @@
+name: Goodbye World
+on: [ push ]
+
+jobs:
+  print_farewell:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say bye to the world
+        run: echo "Goodbye, World!"

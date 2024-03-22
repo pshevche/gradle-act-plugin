@@ -2,7 +2,6 @@ package io.github.pshevche.act.internal
 
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import kotlin.io.path.absolutePathString
 
 class ActRunner : ActConfigBuilder() {
 
@@ -21,7 +20,7 @@ class ActRunner : ActConfigBuilder() {
     private fun cmd(): List<String> = mutableListOf<String>().apply {
         add("act")
         add("--workflows")
-        add(workflows!!.absolutePathString())
+        add(workflows!!.path)
     }
 
     private fun Process.forwardOutput(): Process {

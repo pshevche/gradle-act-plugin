@@ -1,7 +1,6 @@
 package io.github.pshevche.act.fixtures
 
 import io.github.pshevche.act.internal.ActConfigBuilder
-import kotlin.io.path.absolutePathString
 
 class ActExecTaskBuilder : ActConfigBuilder() {
 
@@ -9,7 +8,7 @@ class ActExecTaskBuilder : ActConfigBuilder() {
         val taskConfigBuilder = StringBuilder()
 
         if (workflows != null) {
-            taskConfigBuilder.append("workflows = file('${workflows!!.absolutePathString()}')")
+            taskConfigBuilder.append("workflows = file('${workflows!!.path}')")
         }
 
         return taskConfigBuilder.toString()
