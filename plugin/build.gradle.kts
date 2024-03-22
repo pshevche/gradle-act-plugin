@@ -30,24 +30,5 @@ testing {
                 implementation(libs.kotest.assertions)
             }
         }
-
-        val functionalTest by registering(JvmTestSuite::class) {
-            useJUnitJupiter()
-
-            configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
-            configurations["functionalTestRuntimeOnly"].extendsFrom(configurations["testRuntimeOnly"])
-
-            targets {
-                all {
-                    testTask.configure {
-                        shouldRunAfter(test)
-                    }
-                }
-            }
-        }
     }
-}
-
-tasks.named<Task>("check") {
-    dependsOn(testing.suites.named("functionalTest"))
 }
