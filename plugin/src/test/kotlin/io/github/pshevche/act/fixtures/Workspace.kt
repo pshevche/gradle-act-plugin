@@ -11,6 +11,7 @@ class Workspace(val dir: File) : BeforeTestListener {
     private val settingsFile by lazy { dir.resolve("settings.gradle") }
 
     override suspend fun beforeTest(testCase: TestCase) {
+        cleanWorkspace()
         settingsFile.writeText("")
         buildFile.writeText(
             """
@@ -19,6 +20,10 @@ class Workspace(val dir: File) : BeforeTestListener {
             }
             """
         )
+    }
+
+    private fun cleanWorkspace() {
+        dir.listFiles()?.forEach { it.deleteRecursively() }
     }
 
     fun addWorkflows(workspaceDir: String, vararg workflowNames: String) {
