@@ -9,12 +9,22 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
+/**
+ * Execute arbitrary GitHub workflows using [nektos/act](https://github.com/nektos/act).
+ */
+@Suppress("unused")
 abstract class ActExec : DefaultTask() {
 
+    /**
+     * Path to workflow file(s) (default ".github/workflows").
+     */
     @get:Input
     @get:Optional
     abstract val workflows: Property<File>
 
+    /**
+     * Additional args to pass to the `act` command.
+     */
     @get:Input
     @get:Optional
     val additionalArgs: ListProperty<String> = project.objects.listProperty(String::class.java)
