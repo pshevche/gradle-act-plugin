@@ -1,34 +1,25 @@
 package io.github.pshevche.act
 
+import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldRunJobs
+import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldSucceed
 import io.github.pshevche.act.fixtures.BuildRunner
 import io.github.pshevche.act.fixtures.Workspace
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.engine.spec.tempdir
-import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.TaskOutcome
 
 class ActExecFuncTest : FreeSpec({
 
     val workspace = extension(Workspace(tempdir()))
     val runner = BuildRunner(workspace)
 
-    fun succeeded(result: BuildResult, taskPath: String, expectedJobs: List<String>) {
-        result.output shouldContain "BUILD SUCCESSFUL"
-        result.task(taskPath)?.outcome shouldBe TaskOutcome.SUCCESS
-        expectedJobs shouldContainExactlyInAnyOrder result.output.lines()
-            .filter { it.contains("\uD83C\uDFC1  Job succeeded") }
-            .map { it.substring(it.indexOf("/") + 1, it.indexOf("]")).trim() }
-    }
-
     "runs workflows in the default location" {
         workspace.addWorkflows(".github/workflows/", "hello_world", "goodbye_world")
         workspace.execTask("actAll")
 
         val result = runner.build("actAll")
-        succeeded(result, ":actAll", listOf("print_greeting", "print_farewell"))
+
+        result.shouldSucceed(":actAll")
+        result.shouldRunJobs("print_greeting", "print_farewell")
     }
 
     "supports overriding the location of workflow files" {
@@ -38,7 +29,9 @@ class ActExecFuncTest : FreeSpec({
         }
 
         val result = runner.build("actCustom")
-        succeeded(result, ":actCustom", listOf("print_greeting"))
+
+        result.shouldSucceed(":actCustom")
+        result.shouldRunJobs("print_greeting")
     }
 
     "supports running a single workflow" {
@@ -48,7 +41,9 @@ class ActExecFuncTest : FreeSpec({
         }
 
         val result = runner.build("actSingle")
-        succeeded(result, ":actSingle", listOf("print_greeting"))
+
+        result.shouldSucceed(":actSingle")
+        result.shouldRunJobs("print_greeting")
     }
 
     "is never up-to-date" {
@@ -56,9 +51,11 @@ class ActExecFuncTest : FreeSpec({
         workspace.execTask("actAll")
 
         var result = runner.build("actAll")
-        succeeded(result, ":actAll", listOf("print_greeting"))
+        result.shouldSucceed(":actAll")
+        result.shouldRunJobs("print_greeting")
 
         result = runner.build("actAll")
-        succeeded(result, ":actAll", listOf("print_greeting"))
+        result.shouldSucceed(":actAll")
+        result.shouldRunJobs("print_greeting")
     }
 })
