@@ -16,7 +16,24 @@ class Workspace(val dir: File) : BeforeTestListener {
             plugins {
                 id('io.github.pshevche.act')
             }
-            """.trimIndent()
+            """
         )
+    }
+
+    fun execTask(name: String, config: ActExecBuilder.() -> Unit = { }) {
+        val taskConfig = ActExecBuilder()
+            .apply(config)
+            .toTaskConfig()
+        if (taskConfig.isBlank()) {
+            buildFile.appendText("tasks.register('$name', io.github.pshevche.act.ActExec)")
+        } else {
+            buildFile.appendText(
+                """
+                tasks.register('$name', io.github.pshevche.act.ActExec) {
+                    $taskConfig    
+                }
+                """
+            )
+        }
     }
 }

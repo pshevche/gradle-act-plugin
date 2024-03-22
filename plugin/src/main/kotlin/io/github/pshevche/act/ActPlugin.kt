@@ -3,12 +3,11 @@ package io.github.pshevche.act
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+/**
+ * Gradle plugin for validating GitHub actions using [nektos/act](https://github.com/nektos/act)
+ */
 class ActPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.tasks.register("greeting") { task ->
-            task.doLast {
-                println("Hello from plugin 'io.github.pshevche.act'")
-            }
-        }
+        // do nothing, as the plugin only exposes custom task types
     }
 }
