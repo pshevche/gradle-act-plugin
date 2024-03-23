@@ -15,9 +15,22 @@ object BuildResultAssertions {
         }
     }
 
-    fun BuildResult.shouldRunJobs(vararg jobs: String) {
+    fun BuildResult.shouldFail(vararg tasks: String) {
+        this.output shouldContain "BUILD FAILED"
+        tasks.toList().forEach {
+            this.task(it)?.outcome shouldBe TaskOutcome.FAILED
+        }
+    }
+
+    fun BuildResult.shouldHaveSuccessfulJobs(vararg jobs: String) {
         jobs.toList() shouldContainExactlyInAnyOrder this.output.lines()
             .filter { it.contains("\uD83C\uDFC1  Job succeeded") }
+            .map { it.substring(it.indexOf("/") + 1, it.indexOf("]")).trim() }
+    }
+
+    fun BuildResult.shouldHaveFailedJobs(vararg jobs: String) {
+        jobs.toList() shouldContainExactlyInAnyOrder this.output.lines()
+            .filter { it.contains("\uD83C\uDFC1  Job failed") }
             .map { it.substring(it.indexOf("/") + 1, it.indexOf("]")).trim() }
     }
 }

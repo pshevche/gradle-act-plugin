@@ -13,7 +13,7 @@ class ActRunner : ActConfigBuilder() {
             .waitFor()
 
         if (result != 0) {
-            throw ActPluginException("Failed to invoke act command ${cmd()}: exit code $result")
+            throw ActPluginException("Failed to invoke act command with exit code $result")
         }
     }
 

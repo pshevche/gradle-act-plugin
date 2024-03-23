@@ -1,6 +1,8 @@
 package io.github.pshevche.act
 
-import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldRunJobs
+import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldFail
+import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldHaveFailedJobs
+import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldHaveSuccessfulJobs
 import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldSucceed
 import io.github.pshevche.act.fixtures.BuildRunner
 import io.github.pshevche.act.fixtures.Workspace
@@ -21,7 +23,7 @@ class ActExecFuncTest : FreeSpec({
         val result = runner.build("actAll")
 
         result.shouldSucceed(":actAll")
-        result.shouldRunJobs("print_greeting", "print_farewell")
+        result.shouldHaveSuccessfulJobs("print_greeting", "print_farewell")
     }
 
     "supports overriding the location of workflow files" {
@@ -33,7 +35,7 @@ class ActExecFuncTest : FreeSpec({
         val result = runner.build("actCustom")
 
         result.shouldSucceed(":actCustom")
-        result.shouldRunJobs("print_greeting")
+        result.shouldHaveSuccessfulJobs("print_greeting")
     }
 
     "supports running a single workflow" {
@@ -45,7 +47,7 @@ class ActExecFuncTest : FreeSpec({
         val result = runner.build("actSingle")
 
         result.shouldSucceed(":actSingle")
-        result.shouldRunJobs("print_greeting")
+        result.shouldHaveSuccessfulJobs("print_greeting")
     }
 
     "is never up-to-date" {
@@ -54,11 +56,11 @@ class ActExecFuncTest : FreeSpec({
 
         var result = runner.build("actAll")
         result.shouldSucceed(":actAll")
-        result.shouldRunJobs("print_greeting")
+        result.shouldHaveSuccessfulJobs("print_greeting")
 
         result = runner.build("actAll")
         result.shouldSucceed(":actAll")
-        result.shouldRunJobs("print_greeting")
+        result.shouldHaveSuccessfulJobs("print_greeting")
     }
 
     "allows passing arbitrary additional arguments to act" {
@@ -68,11 +70,21 @@ class ActExecFuncTest : FreeSpec({
             additionalArgs("--list")
         }
 
-        val result = runner.build("actList", "--stacktrace")
+        val result = runner.build("actList")
 
         result.shouldSucceed(":actList")
         result.output shouldContain "Workflow file"
         result.output shouldContain "hello_world.yml"
         result.output shouldNotContain "goodbye_world.yml"
+    }
+
+    "failing workflow will cause the task to fail" {
+        workspace.addWorkflows(".github/workflows/", "failing_job")
+        workspace.execTask("actFailing")
+
+        val result = runner.buildAndFail("actFailing")
+
+        result.shouldFail(":actFailing")
+        result.shouldHaveFailedJobs("failing_job")
     }
 })

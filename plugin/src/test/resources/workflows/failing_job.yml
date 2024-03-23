@@ -1,0 +1,9 @@
+name: Failing workflow
+on: [ push ]
+
+jobs:
+  failing_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Always fail
+        run: exit 1
