@@ -22,6 +22,10 @@ class ActExecTaskBuilder : ActConfigBuilder() {
             )
         }
 
+        if (timeout != null) {
+            taskConfigBuilder.append("timeout = java.time.Duration.ofMillis(${timeout!!.toMillis()})\n")
+        }
+
         return taskConfigBuilder.toString()
     }
 }

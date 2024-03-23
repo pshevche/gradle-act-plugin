@@ -1,5 +1,6 @@
 package io.github.pshevche.act
 
+import io.github.pshevche.act.fixtures.BuildResultAssertions.outputShouldContainEither
 import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldFail
 import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldHaveFailedJobs
 import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldHaveSuccessfulJobs
@@ -10,6 +11,7 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
+import java.time.Duration
 
 class ActExecFuncTest : FreeSpec({
 
@@ -86,5 +88,21 @@ class ActExecFuncTest : FreeSpec({
 
         result.shouldFail(":actFailing")
         result.shouldHaveFailedJobs("failing_job")
+    }
+
+    "respects task timeouts" {
+        workspace.addWorkflows(".github/workflows/", "hello_world")
+        workspace.execTask("actTimeout") {
+            timeout(Duration.ofSeconds(1))
+        }
+
+        val result = runner.buildAndFail("actTimeout")
+
+        result.shouldFail(":actTimeout")
+        result.outputShouldContainEither(
+            "Timeout has been exceeded",
+            "Failed to complete act command within the configured timeout"
+        )
+        result.output shouldNotContain "Job succeeded"
     }
 })

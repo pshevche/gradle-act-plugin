@@ -2,18 +2,33 @@ package io.github.pshevche.act.internal
 
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.util.concurrent.CompletableFuture.supplyAsync
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class ActRunner : ActConfigBuilder() {
 
     fun exec() {
-        val result = ProcessBuilder()
-            .command(cmd())
-            .start()
-            .forwardOutput()
-            .waitFor()
+        val actFuture = supplyAsync {
+            ProcessBuilder()
+                .command(cmd())
+                .start()
+                .forwardOutput()
+                .waitFor()
+        }
 
-        if (result != 0) {
-            throw ActPluginException("Failed to invoke act command with exit code $result")
+        try {
+            val result = if (timeout != null) {
+                actFuture.get(timeout!!.toMillis(), TimeUnit.MILLISECONDS)
+            } else {
+                actFuture.get()
+            }
+
+            if (result != 0) {
+                throw ActPluginException("Failed to invoke act command with exit code $result")
+            }
+        } catch (e: TimeoutException) {
+            throw ActPluginException("Failed to complete act command within the configured timeout", e)
         }
     }
 
