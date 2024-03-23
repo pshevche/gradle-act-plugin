@@ -39,6 +39,7 @@ abstract class ActExec : DefaultTask() {
         val runner = ActRunner()
         runner.workflows(workflows.get())
             .additionalArgs(additionalArgs.get())
+            .timeout(timeout.orNull)
         runner.exec()
     }
 }

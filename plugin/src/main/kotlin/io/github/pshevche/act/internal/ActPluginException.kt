@@ -1,3 +1,8 @@
 package io.github.pshevche.act.internal
 
-class ActPluginException(override val message: String) : RuntimeException(message)
+class ActPluginException : RuntimeException {
+
+    constructor(message: String) : super(message)
+
+    constructor(message: String, cause: Throwable) : super(message, cause)
+}
