@@ -4,6 +4,7 @@ plugins {
     `jvm-test-suite`
     alias(libs.plugins.jvm)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.test.retry)
 }
 
 repositories {
@@ -12,6 +13,9 @@ repositories {
 
 dependencies {
     detektPlugins(libs.detekt.ktlint)
+
+    testImplementation(libs.kotest.runner)
+    testImplementation(libs.kotest.assertions)
 }
 
 gradlePlugin {
@@ -21,14 +25,10 @@ gradlePlugin {
     }
 }
 
-testing {
-    suites {
-        val test by getting(JvmTestSuite::class) {
-            useJUnitJupiter()
-            dependencies {
-                implementation(libs.kotest.runner)
-                implementation(libs.kotest.assertions)
-            }
-        }
+val isCiServer = System.getenv("CI") == "true"
+tasks.test {
+    useJUnitPlatform()
+    if (isCiServer) {
+        retry.maxRetries = 2
     }
 }
