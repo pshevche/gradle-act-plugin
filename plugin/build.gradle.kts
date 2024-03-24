@@ -1,10 +1,11 @@
+import com.gradle.enterprise.gradleplugin.testretry.retry
+
 plugins {
     idea
     `java-gradle-plugin`
     `jvm-test-suite`
     alias(libs.plugins.jvm)
     alias(libs.plugins.detekt)
-    alias(libs.plugins.test.retry)
 }
 
 repositories {

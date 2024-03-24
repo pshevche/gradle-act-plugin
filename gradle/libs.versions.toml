@@ -2,12 +2,10 @@
 detekt = "1.23.5"
 kotest = "5.8.1"
 kotlin = "1.9.23"
-test-retry = "1.5.8"
 
 [plugins]
 jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
-test-retry = { id = "org.gradle.test-retry", version.ref = "test-retry" }
 
 [libraries]
 detekt-ktlint = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
