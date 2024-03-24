@@ -14,8 +14,7 @@ import io.kotest.matchers.string.shouldNotContain
 import java.time.Duration
 
 class ActExecFuncTest : FreeSpec({
-
-    timeout = 60 * 1000
+    timeout = 30 * 1000
 
     val workspace = extension(Workspace(tempdir()))
     val runner = BuildRunner(workspace)
@@ -95,7 +94,7 @@ class ActExecFuncTest : FreeSpec({
     "respects task timeouts" {
         workspace.addWorkflows(".github/workflows/", "hello_world")
         workspace.execTask("actTimeout") {
-            timeout(Duration.ofSeconds(1))
+            timeout(Duration.ofMillis(100))
         }
 
         val result = runner.buildAndFail("actTimeout")
