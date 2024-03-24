@@ -19,5 +19,9 @@ jobs:
           build-scan-publish: true
           build-scan-terms-of-service-url: "https://gradle.com/terms-of-service"
           build-scan-terms-of-service-agree: "yes"
+      - name: Setup act
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash -s -- -b "/usr/bin"
+          echo "-P ubuntu-latest=node:16-buster-slim" > $HOME/.actrc
       - name: Build
         run: ./gradlew build
