@@ -15,6 +15,8 @@ import java.time.Duration
 
 class ActExecFuncTest : FreeSpec({
 
+    timeout = 60 * 1000
+
     val workspace = extension(Workspace(tempdir()))
     val runner = BuildRunner(workspace)
 
