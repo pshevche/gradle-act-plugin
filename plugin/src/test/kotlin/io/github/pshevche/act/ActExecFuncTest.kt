@@ -14,6 +14,7 @@ import io.kotest.matchers.string.shouldNotContain
 import java.time.Duration
 
 class ActExecFuncTest : FreeSpec({
+
     timeout = 30 * 1000
 
     val workspace = extension(Workspace(tempdir()))
@@ -105,5 +106,21 @@ class ActExecFuncTest : FreeSpec({
             "Failed to complete act command within the configured timeout"
         )
         result.output shouldNotContain "Job succeeded"
+    }
+
+    "works with configuration cache" {
+        workspace.addWorkflows(".github/workflows/", "hello_world")
+        workspace.execTask("actDefault")
+
+        var result = runner.build("actDefault", "--configuration-cache")
+
+        result.shouldSucceed(":actDefault")
+        result.output shouldContain "Configuration cache entry stored"
+
+        result = runner.build("actDefault", "--configuration-cache")
+
+        result.shouldSucceed(":actDefault")
+        result.output shouldContain "Reusing configuration cache"
+
     }
 })
