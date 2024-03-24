@@ -121,6 +121,5 @@ class ActExecFuncTest : FreeSpec({
 
         result.shouldSucceed(":actDefault")
         result.output shouldContain "Reusing configuration cache"
-
     }
 })
