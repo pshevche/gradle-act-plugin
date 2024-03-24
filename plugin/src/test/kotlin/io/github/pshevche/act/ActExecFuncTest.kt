@@ -101,6 +101,7 @@ class ActExecFuncTest : FreeSpec({
         val result = runner.buildAndFail("actTimeout")
 
         result.shouldFail(":actTimeout")
+        // Sometimes our check kicks in before Gradle cancels the task
         result.outputShouldContainEither(
             "Timeout has been exceeded",
             "Failed to complete act command within the configured timeout"
