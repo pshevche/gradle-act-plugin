@@ -19,17 +19,23 @@ dependencies {
     testImplementation(libs.kotest.assertions)
 }
 
-gradlePlugin {
-    val act by plugins.creating {
-        id = "io.github.pshevche.act"
-        implementationClass = "io.github.pshevche.act.ActPlugin"
-    }
+detekt {
+    buildUponDefaultConfig = true
+    config.from(file("$rootDir/config/detekt.yml"))
 }
 
 val isCiServer = System.getenv("CI") == "true"
 tasks.test {
+    dependsOn("detekt")
     useJUnitPlatform()
     if (isCiServer) {
         retry.maxRetries = 2
+    }
+}
+
+gradlePlugin {
+    val act by plugins.creating {
+        id = "io.github.pshevche.act"
+        implementationClass = "io.github.pshevche.act.ActPlugin"
     }
 }

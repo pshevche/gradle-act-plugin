@@ -42,15 +42,19 @@ class ActRunner : ActConfigBuilder() {
             add("--env-file")
             add(it.path)
         }
-
         addAll(envValues.flatMap { listOf("--env", "${it.key}=${it.value}") })
 
         secretsFile?.let {
             add("--secret-file")
             add(it.path)
         }
-
         addAll(secretValues.flatMap { listOf("--secret", "${it.key}=${it.value}") })
+
+        variablesFile?.let {
+            add("--var-file")
+            add(it.path)
+        }
+        addAll(variableValues.flatMap { listOf("--var", "${it.key}=${it.value}") })
 
         addAll(additionalArgs)
     }

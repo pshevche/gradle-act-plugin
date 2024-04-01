@@ -272,4 +272,76 @@ class ActExecFuncTest : FreeSpec({
             result.output shouldContain "***, ***!"
         }
     }
+
+    "configures variables" - {
+        "as values" {
+            workspace.addWorkflows(".github/workflows/", "hello_vars")
+            workspace.execTask("actVarValues") {
+                variableValues(
+                    "GREETING" to "Hallo",
+                    "NAME" to "Welt"
+                )
+            }
+
+            val result = runner.build("actVarValues")
+
+            result.shouldSucceed(":actVarValues")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_vars")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "from default file" {
+            workspace.addWorkflows(".github/workflows/", "hello_vars")
+            workspace.dir.resolve(".vars").apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+                appendText("NAME=Welt\n")
+            }
+            workspace.execTask("actVarFile")
+
+            val result = runner.build("actVarFile")
+
+            result.shouldSucceed(":actVarFile")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_vars")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "from custom file" {
+            workspace.addWorkflows(".github/workflows/", "hello_vars")
+            val customVars = workspace.dir.resolve(".customEnv")
+            customVars.apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+                appendText("NAME=Welt\n")
+            }
+            workspace.execTask("actVarFile") {
+                variablesFile = customVars
+            }
+
+            val result = runner.build("actVarFile")
+
+            result.shouldSucceed(":actVarFile")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_vars")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "both from file and as values" {
+            workspace.addWorkflows(".github/workflows/", "hello_vars")
+            val customVars = workspace.dir.resolve(".customEnv")
+            customVars.apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+            }
+            workspace.execTask("actVarFileAndValues") {
+                variablesFile = customVars
+                variableValues("NAME" to "Welt")
+            }
+
+            val result = runner.build("actVarFileAndValues")
+
+            result.shouldSucceed(":actVarFileAndValues")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_vars")
+            result.output shouldContain "Hallo, Welt!"
+        }
+    }
 })
