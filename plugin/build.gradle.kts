@@ -1,5 +1,3 @@
-import com.gradle.enterprise.gradleplugin.testretry.retry
-
 plugins {
     idea
     `java-gradle-plugin`
@@ -24,13 +22,9 @@ detekt {
     config.from(file("$rootDir/config/detekt.yml"))
 }
 
-val isCiServer = System.getenv("CI") == "true"
 tasks.test {
     dependsOn("detekt")
     useJUnitPlatform()
-    if (isCiServer) {
-        retry.maxRetries = 2
-    }
 }
 
 gradlePlugin {
