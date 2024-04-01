@@ -35,6 +35,15 @@ class ActExecTaskBuilder : ActConfigBuilder() {
             taskConfigBuilder.append("env { values.set([$valuesAsString]) }\n")
         }
 
+        secretsFile?.let {
+            taskConfigBuilder.append("secrets.file.set(file('${it.path}'))\n")
+        }
+
+        if (secretValues.isNotEmpty()) {
+            val valuesAsString = secretValues.map { e -> "\"${e.key}\": \"${e.value}\"" }.joinToString(", ")
+            taskConfigBuilder.append("secrets { values.set([$valuesAsString]) }\n")
+        }
+
         return taskConfigBuilder.toString()
     }
 }

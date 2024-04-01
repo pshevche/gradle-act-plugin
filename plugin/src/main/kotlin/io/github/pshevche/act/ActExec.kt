@@ -44,6 +44,20 @@ open class ActExec : DefaultTask() {
     fun env(action: Action<GithubActionInput>) = action.execute(env)
 
     /**
+     * Secrets to make available to actions.
+     * Can be specified in a separate file (default .secrets) or as a map of values.
+     */
+    @get:Nested
+    @get:Optional
+    val secrets: GithubActionInput = DefaultGithubActionInput(objects, projectDir.file(".secrets").asFile)
+
+    /**
+     * Secrets to make available to actions.
+     * Can be specified in a separate file (default .env) or as a map of values.
+     */
+    fun secrets(action: Action<GithubActionInput>) = action.execute(secrets)
+
+    /**
      * Additional args to pass to the `act` command.
      */
     @get:Input
@@ -56,6 +70,8 @@ open class ActExec : DefaultTask() {
         runner.workflows(workflows.get())
             .envFile(env.file.orNull)
             .envValues(env.values.get())
+            .secretsFile(secrets.file.orNull)
+            .secretValues(secrets.values.get())
             .additionalArgs(additionalArgs.get())
             .timeout(timeout.orNull)
         runner.exec()
