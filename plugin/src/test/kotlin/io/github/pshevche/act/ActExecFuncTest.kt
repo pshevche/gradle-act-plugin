@@ -152,11 +152,11 @@ class ActExecFuncTest : FreeSpec({
                 appendText("GREETING=Hallo\n")
                 appendText("NAME=Welt\n")
             }
-            workspace.execTask("actEnvValues")
+            workspace.execTask("actEnvFile")
 
-            val result = runner.build("actEnvValues")
+            val result = runner.build("actEnvFile")
 
-            result.shouldSucceed(":actEnvValues")
+            result.shouldSucceed(":actEnvFile")
             result.shouldHaveSuccessfulJobs("print_greeting_with_env")
             result.output shouldContain "Hallo, Welt!"
         }
@@ -169,13 +169,13 @@ class ActExecFuncTest : FreeSpec({
                 appendText("GREETING=Hallo\n")
                 appendText("NAME=Welt\n")
             }
-            workspace.execTask("actEnvValues") {
+            workspace.execTask("actEnvFile") {
                 envFile = customEnv
             }
 
-            val result = runner.build("actEnvValues")
+            val result = runner.build("actEnvFile")
 
-            result.shouldSucceed(":actEnvValues")
+            result.shouldSucceed(":actEnvFile")
             result.shouldHaveSuccessfulJobs("print_greeting_with_env")
             result.output shouldContain "Hallo, Welt!"
         }
@@ -187,16 +187,89 @@ class ActExecFuncTest : FreeSpec({
                 createNewFile()
                 appendText("GREETING=Hallo\n")
             }
-            workspace.execTask("actEnvValues") {
+            workspace.execTask("actEnvFileAndValues") {
                 envFile = customEnv
                 envValues("NAME" to "Welt")
             }
 
-            val result = runner.build("actEnvValues")
+            val result = runner.build("actEnvFileAndValues")
 
-            result.shouldSucceed(":actEnvValues")
+            result.shouldSucceed(":actEnvFileAndValues")
             result.shouldHaveSuccessfulJobs("print_greeting_with_env")
             result.output shouldContain "Hallo, Welt!"
+        }
+    }
+
+    "configures secrets" - {
+        "as values" {
+            workspace.addWorkflows(".github/workflows/", "hello_secrets")
+            workspace.execTask("actSecretValues") {
+                secretValues(
+                    "GREETING" to "Hallo",
+                    "NAME" to "Welt"
+                )
+                additionalArgs("--insecure-secrets")
+            }
+
+            val result = runner.build("actSecretValues")
+
+            result.shouldSucceed(":actSecretValues")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_secrets")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "from default file" {
+            workspace.addWorkflows(".github/workflows/", "hello_secrets")
+            workspace.dir.resolve(".secrets").apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+                appendText("NAME=Welt\n")
+            }
+            workspace.execTask("actSecretsFile") {
+                additionalArgs("--insecure-secrets")
+            }
+
+            val result = runner.build("actSecretsFile")
+
+            result.shouldSucceed(":actSecretsFile")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_secrets")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "from custom file" {
+            workspace.addWorkflows(".github/workflows/", "hello_secrets")
+            val customSecrets = workspace.dir.resolve(".customSecrets")
+            customSecrets.apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+                appendText("NAME=Welt\n")
+            }
+            workspace.execTask("actSecretsFile") {
+                secretsFile = customSecrets
+                additionalArgs("--insecure-secrets")
+            }
+
+            val result = runner.build("actSecretsFile")
+
+            result.shouldSucceed(":actSecretsFile")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_secrets")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "and hides values" {
+            workspace.addWorkflows(".github/workflows/", "hello_secrets")
+            workspace.dir.resolve(".secrets").apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+                appendText("NAME=Welt\n")
+            }
+            workspace.execTask("actSecretsFile")
+
+            val result = runner.build("actSecretsFile")
+
+            result.shouldSucceed(":actSecretsFile")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_secrets")
+            result.output shouldContain "***, ***!"
         }
     }
 })

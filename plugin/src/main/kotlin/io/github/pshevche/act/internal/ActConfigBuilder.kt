@@ -10,6 +10,8 @@ abstract class ActConfigBuilder {
     var timeout: Duration? = null
     var envFile: File? = null
     var envValues: Map<String, String> = emptyMap()
+    var secretsFile: File? = null
+    var secretValues: Map<String, String> = emptyMap()
 
     fun workflows(workflows: File): ActConfigBuilder {
         this.workflows = workflows
@@ -42,6 +44,21 @@ abstract class ActConfigBuilder {
 
     fun envValues(vararg values: Pair<String, String>): ActConfigBuilder {
         this.envValues = mapOf(*values)
+        return this
+    }
+
+    fun secretsFile(file: File?): ActConfigBuilder {
+        this.secretsFile = file
+        return this
+    }
+
+    fun secretValues(values: Map<String, String>): ActConfigBuilder {
+        this.secretValues = values
+        return this
+    }
+
+    fun secretValues(vararg values: Pair<String, String>): ActConfigBuilder {
+        this.secretValues = mapOf(*values)
         return this
     }
 }

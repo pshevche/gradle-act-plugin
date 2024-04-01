@@ -9,7 +9,6 @@ import java.util.concurrent.TimeoutException
 class ActRunner : ActConfigBuilder() {
 
     fun exec() {
-        println("PSHEVCHE: ${cmd()}")
         val actFuture = supplyAsync {
             ProcessBuilder()
                 .command(cmd())
@@ -45,6 +44,13 @@ class ActRunner : ActConfigBuilder() {
         }
 
         addAll(envValues.flatMap { listOf("--env", "${it.key}=${it.value}") })
+
+        secretsFile?.let {
+            add("--secret-file")
+            add(it.path)
+        }
+
+        addAll(secretValues.flatMap { listOf("--secret", "${it.key}=${it.value}") })
 
         addAll(additionalArgs)
     }
