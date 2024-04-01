@@ -20,51 +20,50 @@ class ActExecFuncTest : FreeSpec({
     val workspace = extension(Workspace(tempdir()))
     val runner = BuildRunner(workspace)
 
-    "runs workflows in the default location" {
-        workspace.addWorkflows(".github/workflows/", "hello_world", "goodbye_world")
-        workspace.execTask("actAll")
+    "failing workflow will cause the task to fail" {
+        workspace.addWorkflows(".github/workflows/", "failing_job")
+        workspace.execTask("actFailing")
 
-        val result = runner.build("actAll")
+        val result = runner.buildAndFail("actFailing")
 
-        result.shouldSucceed(":actAll")
-        result.shouldHaveSuccessfulJobs("print_greeting", "print_farewell")
+        result.shouldFail(":actFailing")
+        result.shouldHaveFailedJobs("failing_job")
     }
 
-    "supports overriding the location of workflow files" {
-        workspace.addWorkflows("custom-workflows/", "hello_world")
-        workspace.execTask("actCustom") {
-            workflows(workspace.dir.resolve("custom-workflows"))
+    "runs workflows in the provided location" - {
+        "default location" {
+            workspace.addWorkflows(".github/workflows/", "hello_world", "goodbye_world")
+            workspace.execTask("actAll")
+
+            val result = runner.build("actAll")
+
+            result.shouldSucceed(":actAll")
+            result.shouldHaveSuccessfulJobs("print_greeting", "print_farewell")
         }
 
-        val result = runner.build("actCustom")
+        "custom workflow directory" {
+            workspace.addWorkflows("custom-workflows/", "hello_world")
+            workspace.execTask("actCustom") {
+                workflows(workspace.dir.resolve("custom-workflows"))
+            }
 
-        result.shouldSucceed(":actCustom")
-        result.shouldHaveSuccessfulJobs("print_greeting")
-    }
+            val result = runner.build("actCustom")
 
-    "supports running a single workflow" {
-        workspace.addWorkflows("custom-workflows/", "hello_world", "goodbye_world")
-        workspace.execTask("actSingle") {
-            workflows(workspace.dir.resolve("custom-workflows/hello_world.yml"))
+            result.shouldSucceed(":actCustom")
+            result.shouldHaveSuccessfulJobs("print_greeting")
         }
 
-        val result = runner.build("actSingle")
+        "custom workflow file" {
+            workspace.addWorkflows("custom-workflows/", "hello_world", "goodbye_world")
+            workspace.execTask("actSingle") {
+                workflows(workspace.dir.resolve("custom-workflows/hello_world.yml"))
+            }
 
-        result.shouldSucceed(":actSingle")
-        result.shouldHaveSuccessfulJobs("print_greeting")
-    }
+            val result = runner.build("actSingle")
 
-    "is never up-to-date" {
-        workspace.addWorkflows(".github/workflows/", "hello_world")
-        workspace.execTask("actAll")
-
-        var result = runner.build("actAll")
-        result.shouldSucceed(":actAll")
-        result.shouldHaveSuccessfulJobs("print_greeting")
-
-        result = runner.build("actAll")
-        result.shouldSucceed(":actAll")
-        result.shouldHaveSuccessfulJobs("print_greeting")
+            result.shouldSucceed(":actSingle")
+            result.shouldHaveSuccessfulJobs("print_greeting")
+        }
     }
 
     "allows passing arbitrary additional arguments to act" {
@@ -82,17 +81,7 @@ class ActExecFuncTest : FreeSpec({
         result.output shouldNotContain "goodbye_world.yml"
     }
 
-    "failing workflow will cause the task to fail" {
-        workspace.addWorkflows(".github/workflows/", "failing_job")
-        workspace.execTask("actFailing")
-
-        val result = runner.buildAndFail("actFailing")
-
-        result.shouldFail(":actFailing")
-        result.shouldHaveFailedJobs("failing_job")
-    }
-
-    "respects task timeouts" {
+    "respects the task timeout" {
         workspace.addWorkflows(".github/workflows/", "hello_world")
         workspace.execTask("actTimeout") {
             timeout(Duration.ofMillis(100))
@@ -109,18 +98,105 @@ class ActExecFuncTest : FreeSpec({
         result.output shouldNotContain "Job succeeded"
     }
 
-    "works with configuration cache" {
-        workspace.addWorkflows(".github/workflows/", "hello_world")
-        workspace.execTask("actDefault")
+    "has the expected cache behavior" - {
+        "is never up-to-date" {
+            workspace.addWorkflows(".github/workflows/", "hello_world")
+            workspace.execTask("actAll")
 
-        var result = runner.build("actDefault", "--configuration-cache")
+            var result = runner.build("actAll")
+            result.shouldSucceed(":actAll")
+            result.shouldHaveSuccessfulJobs("print_greeting")
 
-        result.shouldSucceed(":actDefault")
-        result.output shouldContain "Configuration cache entry stored"
+            result = runner.build("actAll")
+            result.shouldSucceed(":actAll")
+            result.shouldHaveSuccessfulJobs("print_greeting")
+        }
 
-        result = runner.build("actDefault", "--configuration-cache")
+        "works with configuration cache" {
+            workspace.addWorkflows(".github/workflows/", "hello_world")
+            workspace.execTask("actDefault")
 
-        result.shouldSucceed(":actDefault")
-        result.output shouldContain "Reusing configuration cache"
+            var result = runner.build("actDefault", "--configuration-cache")
+
+            result.shouldSucceed(":actDefault")
+            result.output shouldContain "Configuration cache entry stored"
+
+            result = runner.build("actDefault", "--configuration-cache")
+
+            result.shouldSucceed(":actDefault")
+            result.output shouldContain "Reusing configuration cache"
+        }
+    }
+
+    "configures env" - {
+        "as values" {
+            workspace.addWorkflows(".github/workflows/", "hello_env")
+            workspace.execTask("actEnvValues") {
+                envValues(
+                    "GREETING" to "Hallo",
+                    "NAME" to "Welt"
+                )
+            }
+
+            val result = runner.build("actEnvValues")
+
+            result.shouldSucceed(":actEnvValues")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_env")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "from default file" {
+            workspace.addWorkflows(".github/workflows/", "hello_env")
+            workspace.dir.resolve(".env").apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+                appendText("NAME=Welt\n")
+            }
+            workspace.execTask("actEnvValues")
+
+            val result = runner.build("actEnvValues")
+
+            result.shouldSucceed(":actEnvValues")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_env")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "from custom file" {
+            workspace.addWorkflows(".github/workflows/", "hello_env")
+            val customEnv = workspace.dir.resolve(".customEnv")
+            customEnv.apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+                appendText("NAME=Welt\n")
+            }
+            workspace.execTask("actEnvValues") {
+                envFile = customEnv
+            }
+
+            val result = runner.build("actEnvValues")
+
+            result.shouldSucceed(":actEnvValues")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_env")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "both from file and as values" {
+            workspace.addWorkflows(".github/workflows/", "hello_env")
+            val customEnv = workspace.dir.resolve(".customEnv")
+            customEnv.apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+            }
+            workspace.execTask("actEnvValues") {
+                envFile = customEnv
+                envValues("NAME" to "Welt")
+            }
+
+            val result = runner.build("actEnvValues")
+
+            result.shouldSucceed(":actEnvValues")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_env")
+            result.output shouldContain "Hallo, Welt!"
+        }
     }
 })

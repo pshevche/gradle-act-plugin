@@ -7,8 +7,8 @@ class ActExecTaskBuilder : ActConfigBuilder() {
     fun toTaskConfig(): String {
         val taskConfigBuilder = StringBuilder()
 
-        if (workflows != null) {
-            taskConfigBuilder.append("workflows = file('${workflows!!.path}')\n")
+        workflows?.let {
+            taskConfigBuilder.append("workflows = file('${it.path}')\n")
         }
 
         if (additionalArgs.isNotEmpty()) {
@@ -22,8 +22,17 @@ class ActExecTaskBuilder : ActConfigBuilder() {
             )
         }
 
-        if (timeout != null) {
-            taskConfigBuilder.append("timeout = java.time.Duration.ofMillis(${timeout!!.toMillis()})\n")
+        timeout?.let {
+            taskConfigBuilder.append("timeout = java.time.Duration.ofMillis(${it.toMillis()})\n")
+        }
+
+        envFile?.let {
+            taskConfigBuilder.append("env.file.set(file('${it.path}'))\n")
+        }
+
+        if (envValues.isNotEmpty()) {
+            val valuesAsString = envValues.map { e -> "\"${e.key}\": \"${e.value}\"" }.joinToString(", ")
+            taskConfigBuilder.append("env { values.set([$valuesAsString]) }\n")
         }
 
         return taskConfigBuilder.toString()
