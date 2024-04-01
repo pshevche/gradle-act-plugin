@@ -344,4 +344,76 @@ class ActExecFuncTest : FreeSpec({
             result.output shouldContain "Hallo, Welt!"
         }
     }
+
+    "configures inputs" - {
+        "as values" {
+            workspace.addWorkflows(".github/workflows/", "hello_inputs")
+            workspace.execTask("actInputValues") {
+                inputValues(
+                    "GREETING" to "Hallo",
+                    "NAME" to "Welt"
+                )
+            }
+
+            val result = runner.build("actInputValues")
+
+            result.shouldSucceed(":actInputValues")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_inputs")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "from default file" {
+            workspace.addWorkflows(".github/workflows/", "hello_inputs")
+            workspace.dir.resolve(".input").apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+                appendText("NAME=Welt\n")
+            }
+            workspace.execTask("actInputFile")
+
+            val result = runner.build("actInputFile")
+
+            result.shouldSucceed(":actInputFile")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_inputs")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "from custom file" {
+            workspace.addWorkflows(".github/workflows/", "hello_inputs")
+            val customInputs = workspace.dir.resolve(".customInput")
+            customInputs.apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+                appendText("NAME=Welt\n")
+            }
+            workspace.execTask("actInputFile") {
+                inputsFile = customInputs
+            }
+
+            val result = runner.build("actInputFile")
+
+            result.shouldSucceed(":actInputFile")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_inputs")
+            result.output shouldContain "Hallo, Welt!"
+        }
+
+        "both from file and as values" {
+            workspace.addWorkflows(".github/workflows/", "hello_inputs")
+            val customInputs = workspace.dir.resolve(".customInput")
+            customInputs.apply {
+                createNewFile()
+                appendText("GREETING=Hallo\n")
+            }
+            workspace.execTask("actInputFileAndValues") {
+                inputsFile = customInputs
+                inputValues("NAME" to "Welt")
+            }
+
+            val result = runner.build("actInputFileAndValues")
+
+            result.shouldSucceed(":actInputFileAndValues")
+            result.shouldHaveSuccessfulJobs("print_greeting_with_inputs")
+            result.output shouldContain "Hallo, Welt!"
+        }
+    }
 })

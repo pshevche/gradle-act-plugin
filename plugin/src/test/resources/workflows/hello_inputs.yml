@@ -1,0 +1,17 @@
+name: Hello World
+on:
+  workflow_dispatch:
+    inputs:
+      GREETING:
+        required: true
+        type: string
+      NAME:
+        required: true
+        type: string
+
+jobs:
+  print_greeting_with_inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Greet someone
+        run: echo "${{ inputs.GREETING }}, ${{ inputs.NAME }}!"
