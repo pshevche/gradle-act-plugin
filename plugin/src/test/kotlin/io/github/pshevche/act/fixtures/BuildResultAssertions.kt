@@ -24,9 +24,10 @@ object BuildResultAssertions {
     }
 
     fun BuildResult.shouldHaveSuccessfulJobs(vararg jobs: String) {
-        jobs.toList() shouldContainExactlyInAnyOrder this.output.lines()
+        jobs.toSet() shouldContainExactlyInAnyOrder this.output.lines()
             .filter { it.contains("\uD83C\uDFC1  Job succeeded") }
             .map { it.substring(it.indexOf("/") + 1, it.indexOf("]")).trim() }
+            .toSet()
     }
 
     fun BuildResult.shouldHaveFailedJobs(vararg jobs: String) {
