@@ -17,7 +17,7 @@ class TaskPropertiesActExecFuncTest : FreeSpec({
     val project = extension(GradleProject(tempdir()))
 
     "failing workflow will cause the task to fail" {
-        project.addWorkflows(".github/workflows/", "failing_job")
+        project.addWorkflows(".github/workflows/", "single_failing_job")
         project.execTask("actFailing")
 
         val result = project.buildAndFail("actFailing")

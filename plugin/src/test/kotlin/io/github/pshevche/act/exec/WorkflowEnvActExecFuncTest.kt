@@ -12,7 +12,7 @@ class WorkflowEnvActExecFuncTest : FreeSpec({
     val project = extension(GradleProject(tempdir()))
 
     "allows configuring workflow env as values" {
-        project.addWorkflows(".github/workflows/", "hello_env")
+        project.addWorkflows(".github/workflows/", "workflow_with_env")
         project.execTask("actEnvValues") {
             envValues(
                 "GREETING" to "Hallo",
@@ -28,7 +28,7 @@ class WorkflowEnvActExecFuncTest : FreeSpec({
     }
 
     "configures workflow env from default file" {
-        project.addWorkflows(".github/workflows/", "hello_env")
+        project.addWorkflows(".github/workflows/", "workflow_with_env")
         project.workspaceDir.resolve(".env").apply {
             createNewFile()
             appendText("GREETING=Hallo\n")
@@ -44,7 +44,7 @@ class WorkflowEnvActExecFuncTest : FreeSpec({
     }
 
     "configure workflow env from custom file" {
-        project.addWorkflows(".github/workflows/", "hello_env")
+        project.addWorkflows(".github/workflows/", "workflow_with_env")
         val customEnv = project.workspaceDir.resolve(".customEnv")
         customEnv.apply {
             createNewFile()
@@ -63,7 +63,7 @@ class WorkflowEnvActExecFuncTest : FreeSpec({
     }
 
     "configures workflow env both from file and as values" {
-        project.addWorkflows(".github/workflows/", "hello_env")
+        project.addWorkflows(".github/workflows/", "workflow_with_env")
         val customEnv = project.workspaceDir.resolve(".customEnv")
         customEnv.apply {
             createNewFile()
