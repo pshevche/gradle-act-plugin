@@ -3,12 +3,14 @@ package io.github.pshevche.act.fixtures
 import io.kotest.core.listeners.BeforeTestListener
 import io.kotest.core.test.TestCase
 import org.gradle.internal.impldep.com.google.common.io.Files
+import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.GradleRunner
 import java.io.File
 
-class Workspace(val dir: File) : BeforeTestListener {
+class GradleProject(val workspaceDir: File) : BeforeTestListener {
 
-    private val buildFile by lazy { dir.resolve("build.gradle") }
-    private val settingsFile by lazy { dir.resolve("settings.gradle") }
+    private val buildFile by lazy { workspaceDir.resolve("build.gradle") }
+    private val settingsFile by lazy { workspaceDir.resolve("settings.gradle") }
 
     override suspend fun beforeTest(testCase: TestCase) {
         cleanWorkspace()
@@ -23,12 +25,12 @@ class Workspace(val dir: File) : BeforeTestListener {
     }
 
     private fun cleanWorkspace() {
-        dir.listFiles()?.forEach { it.deleteRecursively() }
+        workspaceDir.listFiles()?.forEach { it.deleteRecursively() }
     }
 
     fun addWorkflows(workspaceDir: String, vararg workflowNames: String) {
         workflowNames.forEach { workflowName ->
-            val workflowFile = dir.resolve(workspaceDir).resolve("$workflowName.yml")
+            val workflowFile = this.workspaceDir.resolve(workspaceDir).resolve("$workflowName.yml")
             Files.createParentDirs(workflowFile)
             copyWorkflowContent(workflowFile, workflowName)
         }
@@ -61,4 +63,15 @@ class Workspace(val dir: File) : BeforeTestListener {
             )
         }
     }
+
+    fun build(vararg args: String): BuildResult = runner(*args).build()
+
+    fun buildAndFail(vararg args: String): BuildResult = runner(*args).buildAndFail()
+
+    private fun runner(vararg args: String): GradleRunner =
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments(args.toList())
+            .withProjectDir(workspaceDir)
 }
