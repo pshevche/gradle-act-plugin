@@ -11,7 +11,7 @@ import java.io.File
  * Those can be supplied as a file containing values or as a map of values.
  * For the exact specification of the format, see the task documentation.
  */
-interface GithubActionInput {
+interface ActInputSpec {
 
     @get:Input
     @get:Optional

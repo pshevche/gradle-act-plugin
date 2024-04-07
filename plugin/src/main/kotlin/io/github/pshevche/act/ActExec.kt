@@ -1,7 +1,7 @@
 package io.github.pshevche.act
 
 import io.github.pshevche.act.internal.ActRunner
-import io.github.pshevche.act.internal.DefaultGithubActionInput
+import io.github.pshevche.act.internal.DefaultActInputSpec
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
@@ -35,13 +35,13 @@ open class ActExec : DefaultTask() {
      */
     @get:Nested
     @get:Optional
-    val env: GithubActionInput = DefaultGithubActionInput(objects, projectDir.file(".env").asFile)
+    val env: ActInputSpec = DefaultActInputSpec(objects, projectDir.file(".env").asFile)
 
     /**
      * Env to make available to actions.
      * Can be specified in a separate file (default .env) or as a map of values.
      */
-    fun env(action: Action<GithubActionInput>) = action.execute(env)
+    fun env(action: Action<ActInputSpec>) = action.execute(env)
 
     /**
      * Inputs to make available to actions.
@@ -49,13 +49,13 @@ open class ActExec : DefaultTask() {
      */
     @get:Nested
     @get:Optional
-    val actionInputs: GithubActionInput = DefaultGithubActionInput(objects, projectDir.file(".input").asFile)
+    val actionInputs: ActInputSpec = DefaultActInputSpec(objects, projectDir.file(".input").asFile)
 
     /**
      * Inputs to make available to actions.
      * Can be specified in a separate file (default .input) or as a map of values.
      */
-    fun actionInputs(action: Action<GithubActionInput>) = action.execute(actionInputs)
+    fun actionInputs(action: Action<ActInputSpec>) = action.execute(actionInputs)
 
     /**
      * Secrets to make available to actions.
@@ -63,13 +63,13 @@ open class ActExec : DefaultTask() {
      */
     @get:Nested
     @get:Optional
-    val secrets: GithubActionInput = DefaultGithubActionInput(objects, projectDir.file(".secrets").asFile)
+    val secrets: ActInputSpec = DefaultActInputSpec(objects, projectDir.file(".secrets").asFile)
 
     /**
      * Secrets to make available to actions.
      * Can be specified in a separate file (default .env) or as a map of values.
      */
-    fun secrets(action: Action<GithubActionInput>) = action.execute(secrets)
+    fun secrets(action: Action<ActInputSpec>) = action.execute(secrets)
 
     /**
      * Variables to make available to actions.
@@ -77,13 +77,13 @@ open class ActExec : DefaultTask() {
      */
     @get:Nested
     @get:Optional
-    val variables: GithubActionInput = DefaultGithubActionInput(objects, projectDir.file(".vars").asFile)
+    val variables: ActInputSpec = DefaultActInputSpec(objects, projectDir.file(".vars").asFile)
 
     /**
      * Variables to make available to actions.
      * Can be specified in a separate file (default .vars) or as a map of values.
      */
-    fun variables(action: Action<GithubActionInput>) = action.execute(variables)
+    fun variables(action: Action<ActInputSpec>) = action.execute(variables)
 
     /**
      * Additional args to pass to the `act` command.
