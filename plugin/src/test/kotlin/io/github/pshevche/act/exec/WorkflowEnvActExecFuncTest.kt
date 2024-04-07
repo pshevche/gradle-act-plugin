@@ -9,8 +9,6 @@ import io.kotest.matchers.string.shouldContain
 
 class WorkflowEnvActExecFuncTest : FreeSpec({
 
-    timeout = 30 * 1000
-
     val project = extension(GradleProject(tempdir()))
 
     "allows configuring workflow env as values" {

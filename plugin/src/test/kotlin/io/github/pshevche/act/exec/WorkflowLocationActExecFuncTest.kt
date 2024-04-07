@@ -8,8 +8,6 @@ import io.kotest.engine.spec.tempdir
 
 class WorkflowLocationActExecFuncTest : FreeSpec({
 
-    timeout = 30 * 1000
-
     val project = extension(GradleProject(tempdir()))
 
     "runs workflows in the default location" {
