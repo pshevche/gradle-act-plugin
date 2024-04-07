@@ -38,6 +38,11 @@ class ActRunner : ActConfigBuilder() {
         add("--workflows")
         add(workflows!!.path)
 
+        job?.let {
+            add("--job")
+            add(it)
+        }
+
         envFile?.let {
             add("--env-file")
             add(it.path)

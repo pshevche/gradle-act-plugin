@@ -11,6 +11,10 @@ class ActExecTaskBuilder : ActConfigBuilder() {
             taskConfigBuilder.append("workflows = file('${it.path}')\n")
         }
 
+        job?.let {
+            taskConfigBuilder.append("job = '$it'\n")
+        }
+
         timeout?.let {
             taskConfigBuilder.append("timeout = java.time.Duration.ofMillis(${it.toMillis()})\n")
         }
