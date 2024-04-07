@@ -12,7 +12,7 @@ class ConfigurationVarsActExecFuncTest : FreeSpec({
     val project = extension(GradleProject(tempdir()))
 
     "allows setting configuration vars values" {
-        project.addWorkflows(".github/workflows/", "hello_vars")
+        project.addWorkflows(".github/workflows/", "workflow_with_vars")
         project.execTask("actVarValues") {
             variableValues(
                 "GREETING" to "Hallo",
@@ -28,7 +28,7 @@ class ConfigurationVarsActExecFuncTest : FreeSpec({
     }
 
     "sets configuration vars from default file" {
-        project.addWorkflows(".github/workflows/", "hello_vars")
+        project.addWorkflows(".github/workflows/", "workflow_with_vars")
         project.workspaceDir.resolve(".vars").apply {
             createNewFile()
             appendText("GREETING=Hallo\n")
@@ -44,7 +44,7 @@ class ConfigurationVarsActExecFuncTest : FreeSpec({
     }
 
     "sets configuration vars from custom file" {
-        project.addWorkflows(".github/workflows/", "hello_vars")
+        project.addWorkflows(".github/workflows/", "workflow_with_vars")
         val customVars = project.workspaceDir.resolve(".customEnv")
         customVars.apply {
             createNewFile()
@@ -63,7 +63,7 @@ class ConfigurationVarsActExecFuncTest : FreeSpec({
     }
 
     "sets configuration vars both from file and as values" {
-        project.addWorkflows(".github/workflows/", "hello_vars")
+        project.addWorkflows(".github/workflows/", "workflow_with_vars")
         val customVars = project.workspaceDir.resolve(".customEnv")
         customVars.apply {
             createNewFile()

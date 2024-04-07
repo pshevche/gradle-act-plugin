@@ -12,7 +12,7 @@ class WorkflowInputsActExecFuncTest : FreeSpec({
     val project = extension(GradleProject(tempdir()))
 
     "allows settings workflow inputs as values" {
-        project.addWorkflows(".github/workflows/", "hello_inputs")
+        project.addWorkflows(".github/workflows/", "workflow_with_inputs")
         project.execTask("actInputValues") {
             inputValues(
                 "GREETING" to "Hallo",
@@ -28,7 +28,7 @@ class WorkflowInputsActExecFuncTest : FreeSpec({
     }
 
     "sets workflow inputs from default file" {
-        project.addWorkflows(".github/workflows/", "hello_inputs")
+        project.addWorkflows(".github/workflows/", "workflow_with_inputs")
         project.workspaceDir.resolve(".input").apply {
             createNewFile()
             appendText("GREETING=Hallo\n")
@@ -44,7 +44,7 @@ class WorkflowInputsActExecFuncTest : FreeSpec({
     }
 
     "sets workflow inputs from custom file" {
-        project.addWorkflows(".github/workflows/", "hello_inputs")
+        project.addWorkflows(".github/workflows/", "workflow_with_inputs")
         val customInputs = project.workspaceDir.resolve(".customInput")
         customInputs.apply {
             createNewFile()
@@ -63,7 +63,7 @@ class WorkflowInputsActExecFuncTest : FreeSpec({
     }
 
     "sets workflow inputs both from file and as values" {
-        project.addWorkflows(".github/workflows/", "hello_inputs")
+        project.addWorkflows(".github/workflows/", "workflow_with_inputs")
         val customInputs = project.workspaceDir.resolve(".customInput")
         customInputs.apply {
             createNewFile()

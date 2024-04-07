@@ -11,7 +11,7 @@ class JobFilterActExecFuncTest : FreeSpec({
     val project = extension(GradleProject(tempdir()))
 
     "runs specified job from the workflow" {
-        project.addWorkflows(".github/workflows/", "hello_and_goodbye_world")
+        project.addWorkflows(".github/workflows/", "multiple_jobs")
         project.execTask("actAll") {
             job("print_farewell")
         }
@@ -23,7 +23,7 @@ class JobFilterActExecFuncTest : FreeSpec({
     }
 
     "runs all jobs by default" {
-        project.addWorkflows(".github/workflows/", "hello_and_goodbye_world")
+        project.addWorkflows(".github/workflows/", "multiple_jobs")
         project.execTask("actAll")
 
         val result = project.build("actAll")

@@ -12,7 +12,7 @@ class WorkflowSecretsActExecFuncTest : FreeSpec({
     val project = extension(GradleProject(tempdir()))
 
     "allows configuring secrets values" {
-        project.addWorkflows(".github/workflows/", "hello_secrets")
+        project.addWorkflows(".github/workflows/", "workflow_with_secrets")
         project.execTask("actSecretValues") {
             secretValues(
                 "GREETING" to "Hallo",
@@ -29,7 +29,7 @@ class WorkflowSecretsActExecFuncTest : FreeSpec({
     }
 
     "configures secrets from default file" {
-        project.addWorkflows(".github/workflows/", "hello_secrets")
+        project.addWorkflows(".github/workflows/", "workflow_with_secrets")
         project.workspaceDir.resolve(".secrets").apply {
             createNewFile()
             appendText("GREETING=Hallo\n")
@@ -47,7 +47,7 @@ class WorkflowSecretsActExecFuncTest : FreeSpec({
     }
 
     "configures secrets from custom file" {
-        project.addWorkflows(".github/workflows/", "hello_secrets")
+        project.addWorkflows(".github/workflows/", "workflow_with_secrets")
         val customSecrets = project.workspaceDir.resolve(".customSecrets")
         customSecrets.apply {
             createNewFile()
@@ -67,7 +67,7 @@ class WorkflowSecretsActExecFuncTest : FreeSpec({
     }
 
     "hides secrets values by default" {
-        project.addWorkflows(".github/workflows/", "hello_secrets")
+        project.addWorkflows(".github/workflows/", "workflow_with_secrets")
         project.workspaceDir.resolve(".secrets").apply {
             createNewFile()
             appendText("GREETING=Hallo\n")
