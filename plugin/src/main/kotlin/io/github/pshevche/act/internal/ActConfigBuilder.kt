@@ -17,6 +17,8 @@ abstract class ActConfigBuilder {
     var variableValues: Map<String, String> = emptyMap()
     var inputsFile: File? = null
     var inputValues: Map<String, String> = emptyMap()
+    var eventType: String? = null
+    var eventPayload: File? = null
 
     fun workflows(workflows: File): ActConfigBuilder {
         this.workflows = workflows
@@ -99,6 +101,16 @@ abstract class ActConfigBuilder {
 
     fun inputValues(vararg values: Pair<String, String>): ActConfigBuilder {
         this.inputValues = mapOf(*values)
+        return this
+    }
+
+    fun eventType(type: String?): ActConfigBuilder {
+        this.eventType = type
+        return this
+    }
+
+    fun eventPayload(eventPayload: File?): ActConfigBuilder {
+        this.eventPayload = eventPayload
         return this
     }
 }
