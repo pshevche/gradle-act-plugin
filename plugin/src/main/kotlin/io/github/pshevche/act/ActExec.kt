@@ -30,6 +30,13 @@ open class ActExec : DefaultTask() {
         objects.property(File::class.java).convention(projectDir.dir(".github/workflows").asFile)
 
     /**
+     * Job ID to execute (run all jobs by default).
+     */
+    @get:Input
+    @get:Optional
+    val job: Property<String> = objects.property(String::class.java)
+
+    /**
      * Env to make available to actions.
      * Can be specified in a separate file (default .env) or as a map of values.
      */
@@ -96,6 +103,7 @@ open class ActExec : DefaultTask() {
     fun exec() {
         val runner = ActRunner()
         runner.workflows(workflows.get())
+            .job(job.orNull)
             .envFile(env.file.orNull)
             .envValues(env.values.get())
             .inputsFile(actionInputs.file.orNull)
