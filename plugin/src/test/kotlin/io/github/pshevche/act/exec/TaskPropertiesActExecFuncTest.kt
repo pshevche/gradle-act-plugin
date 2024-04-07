@@ -14,8 +14,6 @@ import java.time.Duration
 
 class TaskPropertiesActExecFuncTest : FreeSpec({
 
-    timeout = 30 * 1000
-
     val project = extension(GradleProject(tempdir()))
 
     "failing workflow will cause the task to fail" {

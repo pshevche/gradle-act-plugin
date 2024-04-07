@@ -9,8 +9,6 @@ import io.kotest.matchers.string.shouldNotContain
 
 class AdditionalArgsActExecFuncTest : FreeSpec({
 
-    timeout = 30 * 1000
-
     val project = extension(GradleProject(tempdir()))
 
     "allows passing arbitrary additional arguments to act" {
