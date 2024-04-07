@@ -51,6 +51,13 @@ class ActExecTaskBuilder : ActConfigBuilder() {
             taskConfigBuilder.append("actionInputs { values.set([$valuesAsString]) }\n")
         }
 
+        eventType?.let {
+            taskConfigBuilder.append("event.type.set('$it')\n")
+        }
+        eventPayload?.let {
+            taskConfigBuilder.append("event { payload.set(file('${it.path}')) }\n")
+        }
+
         if (additionalArgs.isNotEmpty()) {
             taskConfigBuilder.append(
                 "additionalArgs = [${

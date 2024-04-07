@@ -35,6 +35,16 @@ class ActRunner : ActConfigBuilder() {
     private fun cmd(): List<String> = mutableListOf<String>().apply {
         add("act")
 
+        if (eventType == null) {
+            add("--detect-event")
+        } else {
+            add(eventType!!)
+        }
+        eventPayload?.let {
+            add("--eventpath")
+            add(it.path)
+        }
+
         add("--workflows")
         add(workflows!!.path)
 

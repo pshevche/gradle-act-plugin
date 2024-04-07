@@ -1,0 +1,11 @@
+name: Simple workflow printing the name and the payload of the event that triggered it
+on: [ issue_comment, pull_request ]
+
+jobs:
+  print_event_and_payload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Greet someone
+        run: |
+          echo "event = ${{ github.event_name }}"
+          echo "payload = ${{ toJSON(github.event) }}"

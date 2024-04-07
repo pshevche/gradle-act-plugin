@@ -1,6 +1,7 @@
 package io.github.pshevche.act
 
 import io.github.pshevche.act.internal.ActRunner
+import io.github.pshevche.act.internal.DefaultActEventSpec
 import io.github.pshevche.act.internal.DefaultActInputSpec
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
@@ -93,6 +94,18 @@ open class ActExec : DefaultTask() {
     fun variables(action: Action<ActInputSpec>) = action.execute(variables)
 
     /**
+     * Event type and payload to trigger the workflow with.
+     */
+    @get:Nested
+    @get:Optional
+    val event: ActEventSpec = DefaultActEventSpec(objects)
+
+    /**
+     * Event type and payload to trigger the workflow with.
+     */
+    fun event(action: Action<ActEventSpec>) = action.execute(event)
+
+    /**
      * Additional args to pass to the `act` command.
      */
     @get:Input
@@ -113,6 +126,8 @@ open class ActExec : DefaultTask() {
             .variablesFile(variables.file.orNull)
             .variableValues(variables.values.get())
             .additionalArgs(additionalArgs.get())
+            .eventType(event.type.orNull)
+            .eventPayload(event.payload.orNull)
             .timeout(timeout.orNull)
         runner.exec()
     }
