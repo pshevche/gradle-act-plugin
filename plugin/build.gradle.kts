@@ -19,7 +19,6 @@ dependencies {
 
 detekt {
     buildUponDefaultConfig = true
-    config.from(file("$rootDir/config/detekt.yml"))
 }
 
 tasks.test {

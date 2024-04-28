@@ -1,5 +1,0 @@
-complexity:
-  TooManyFunctions:
-    active: false
-  CyclomaticComplexMethod:
-    active: false

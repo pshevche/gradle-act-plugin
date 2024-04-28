@@ -1,10 +1,12 @@
 package io.github.pshevche.act.internal
 
 import java.io.BufferedReader
+import java.io.InputStream
 import java.io.InputStreamReader
 import java.util.concurrent.CompletableFuture.supplyAsync
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import kotlin.io.path.absolutePathString
 
 class ActRunner : ActConfigBuilder() {
 
@@ -32,7 +34,7 @@ class ActRunner : ActConfigBuilder() {
         }
     }
 
-    private fun cmd(): List<String> = mutableListOf<String>().apply {
+    private fun cmd() = mutableListOf<String>().apply {
         add("act")
 
         if (eventType == null) {
@@ -77,18 +79,35 @@ class ActRunner : ActConfigBuilder() {
         }
         addAll(variableValues.flatMap { listOf("--var", "${it.key}=${it.value}") })
 
+        artifactServer.let {
+            if (it.enabled) {
+                add("--artifact-server-path")
+                add(it.path!!.absolutePathString())
+
+                add("--artifact-server-addr")
+                add(it.host!!)
+
+                add("--artifact-server-port")
+                add(it.port!!.toString())
+            }
+        }
+
         addAll(additionalArgs)
     }
 
-    private fun Process.forwardOutput(): Process {
-        BufferedReader(InputStreamReader(inputStream)).use { reader ->
+    private fun Process.forwardOutput() = apply {
+        listOf(inputStream, errorStream).forEach {
+            forwardStream(it)
+        }
+    }
+
+    private fun forwardStream(stream: InputStream) {
+        BufferedReader(InputStreamReader(stream)).use { reader ->
             var line: String? = reader.readLine()
             while (line != null) {
                 println(line)
                 line = reader.readLine()
             }
         }
-
-        return this
     }
 }

@@ -1,0 +1,17 @@
+name: Hello World
+on: [ push ]
+
+jobs:
+  upload_artifact_with_greetings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create folder with different greetings
+        run: |
+          mkdir greetings
+          echo "Hello, World!" >> greetings/english.txt
+          echo "Hallo, Welt!" >> greetings/deutsch.txt
+      - name: Upload greetings folder as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: greetings_artifact
+          path: greetings
