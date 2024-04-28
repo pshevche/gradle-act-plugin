@@ -1,5 +1,6 @@
 package io.github.pshevche.act.exec
 
+import io.github.pshevche.act.extensions.LocalOnly
 import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldFail
 import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldHaveFailedJobs
 import io.github.pshevche.act.fixtures.BuildResultAssertions.shouldHaveSuccessfulJobs
@@ -10,6 +11,7 @@ import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.string.shouldContain
 
+@LocalOnly("act cannot bind the default artifact server address on a native GitHub runner")
 class ArtifactServerActExecFuncTest : FreeSpec({
 
     val project = extension(GradleProject(tempdir()))
