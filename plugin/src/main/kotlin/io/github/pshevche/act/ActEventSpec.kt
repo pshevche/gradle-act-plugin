@@ -18,4 +18,9 @@ interface ActEventSpec {
     @get:InputFile
     @get:Optional
     val payload: RegularFileProperty
+
+    fun finalizeValue() {
+        type.finalizeValue()
+        payload.finalizeValue()
+    }
 }

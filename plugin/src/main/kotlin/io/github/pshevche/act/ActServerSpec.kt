@@ -34,6 +34,13 @@ interface ActServerSpec {
     @get:Input
     val path: Property<Path>
 
+    fun finalizeValue() {
+        enabled.finalizeValue()
+        path.finalizeValue()
+        address.host.finalizeValue()
+        address.port.finalizeValue()
+    }
+
     interface ActServerAddress {
         @get:Input
         val host: Property<String>
