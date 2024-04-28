@@ -2,6 +2,7 @@ package io.github.pshevche.act.fixtures
 
 import io.github.pshevche.act.internal.ActConfigBuilder
 
+@Suppress("LongMethod", "CyclomaticComplexMethod")
 class ActExecTaskBuilder : ActConfigBuilder() {
 
     fun toTaskConfig(): String {
@@ -56,6 +57,17 @@ class ActExecTaskBuilder : ActConfigBuilder() {
         }
         eventPayload?.let {
             taskConfigBuilder.append("event { payload.set(file('${it.path}')) }\n")
+        }
+
+        artifactServer.let {
+            if (it.enabled) {
+                taskConfigBuilder.append("artifactServer { \n")
+                taskConfigBuilder.append("\tenabled.set(true)\n")
+                it.path?.let { p -> taskConfigBuilder.append("\tpath.set(java.nio.file.Paths.get(\"${p}\"))\n") }
+                it.host?.let { h -> taskConfigBuilder.append("\taddress.host.set(\"${h}\")\n") }
+                it.port?.let { p -> taskConfigBuilder.append("\taddress.port.set($p)\n") }
+                taskConfigBuilder.append("}\n")
+            }
         }
 
         if (additionalArgs.isNotEmpty()) {

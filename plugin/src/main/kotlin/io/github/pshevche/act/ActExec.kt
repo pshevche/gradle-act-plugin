@@ -3,6 +3,7 @@ package io.github.pshevche.act
 import io.github.pshevche.act.internal.ActRunner
 import io.github.pshevche.act.internal.DefaultActEventSpec
 import io.github.pshevche.act.internal.DefaultActInputSpec
+import io.github.pshevche.act.internal.DefaultActServerSpec
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -24,7 +25,7 @@ open class ActExec : DefaultTask() {
     private val objects = project.objects
 
     /**
-     * Path to workflow file(s) (default ".github/workflows").
+     * Path to workflow file(s).
      */
     @get:InputFile
     val workflow: RegularFileProperty = objects.fileProperty()
@@ -38,7 +39,7 @@ open class ActExec : DefaultTask() {
 
     /**
      * Env to make available to actions.
-     * Can be specified in a separate file (default .env) or as a map of values.
+     * Can be specified in a separate file or as a map of values.
      */
     @get:Nested
     @get:Optional
@@ -46,13 +47,13 @@ open class ActExec : DefaultTask() {
 
     /**
      * Env to make available to actions.
-     * Can be specified in a separate file (default .env) or as a map of values.
+     * Can be specified in a separate file or as a map of values.
      */
     fun env(action: Action<ActInputSpec>) = action.execute(env)
 
     /**
      * Inputs to make available to actions.
-     * Can be specified in a separate file (default .input) or as a map of values.
+     * Can be specified in a separate file or as a map of values.
      */
     @get:Nested
     @get:Optional
@@ -60,13 +61,13 @@ open class ActExec : DefaultTask() {
 
     /**
      * Inputs to make available to actions.
-     * Can be specified in a separate file (default .input) or as a map of values.
+     * Can be specified in a separate file or as a map of values.
      */
     fun actionInputs(action: Action<ActInputSpec>) = action.execute(actionInputs)
 
     /**
      * Secrets to make available to actions.
-     * Can be specified in a separate file (default .secrets) or as a map of values.
+     * Can be specified in a separate file or as a map of values.
      */
     @get:Nested
     @get:Optional
@@ -74,13 +75,13 @@ open class ActExec : DefaultTask() {
 
     /**
      * Secrets to make available to actions.
-     * Can be specified in a separate file (default .env) or as a map of values.
+     * Can be specified in a separate file or as a map of values.
      */
     fun secrets(action: Action<ActInputSpec>) = action.execute(secrets)
 
     /**
      * Variables to make available to actions.
-     * Can be specified in a separate file (default .vars) or as a map of values.
+     * Can be specified in a separate file or as a map of values.
      */
     @get:Nested
     @get:Optional
@@ -88,7 +89,7 @@ open class ActExec : DefaultTask() {
 
     /**
      * Variables to make available to actions.
-     * Can be specified in a separate file (default .vars) or as a map of values.
+     * Can be specified in a separate file or as a map of values.
      */
     fun variables(action: Action<ActInputSpec>) = action.execute(variables)
 
@@ -105,6 +106,24 @@ open class ActExec : DefaultTask() {
     fun event(action: Action<ActEventSpec>) = action.execute(event)
 
     /**
+     * Defines the configuration of the artifact server.
+     */
+    @get:Nested
+    @get:Optional
+    @Suppress("MagicNumber")
+    val artifactServer: ActServerSpec = DefaultActServerSpec(
+        objects,
+        "192.168.0.54",
+        34567,
+        project.layout.buildDirectory.dir("act/artifact").get().asFile.toPath()
+    )
+
+    /**
+     * Defines the configuration of the artifact server.
+     */
+    fun artifactServer(action: Action<ActServerSpec>) = action.execute(artifactServer)
+
+    /**
      * Additional args to pass to the `act` command.
      */
     @get:Input
@@ -113,6 +132,7 @@ open class ActExec : DefaultTask() {
 
     @TaskAction
     fun exec() {
+        validateAndFinalizeProperties()
         val runner = ActRunner()
         runner.workflow(workflow.get().asFile)
             .job(job.orNull)
@@ -127,7 +147,17 @@ open class ActExec : DefaultTask() {
             .additionalArgs(additionalArgs.get())
             .eventType(event.type.orNull)
             .eventPayload(event.payload.asFile.orNull)
+            .artifactServer {
+                enabled(artifactServer.enabled.get())
+                path(artifactServer.path.get())
+                host(artifactServer.address.host.get())
+                port(artifactServer.address.port.get())
+            }
             .timeout(timeout.orNull)
         runner.exec()
+    }
+
+    private fun validateAndFinalizeProperties() {
+        TODO("Not yet implemented")
     }
 }

@@ -1,8 +1,10 @@
 package io.github.pshevche.act.internal
 
 import java.io.File
+import java.nio.file.Path
 import java.time.Duration
 
+@Suppress("TooManyFunctions")
 abstract class ActConfigBuilder {
 
     var workflow: File? = null
@@ -19,100 +21,108 @@ abstract class ActConfigBuilder {
     var inputValues: Map<String, String> = emptyMap()
     var eventType: String? = null
     var eventPayload: File? = null
+    var artifactServer: ArtifactServerBuilder = ArtifactServerBuilder()
 
-    fun workflow(workflowPath: String): ActConfigBuilder = workflow(File(workflowPath))
+    fun workflow(workflowPath: String) = workflow(File(workflowPath))
 
-    fun workflow(workflow: File): ActConfigBuilder {
+    fun workflow(workflow: File) = apply {
         this.workflow = workflow
-        return this
     }
 
-    fun job(job: String?): ActConfigBuilder {
+    fun job(job: String?) = apply {
         this.job = job
-        return this
     }
 
-    fun additionalArgs(vararg args: String): ActConfigBuilder {
-        return additionalArgs(args.toList())
-    }
+    fun additionalArgs(vararg args: String) = additionalArgs(args.toList())
 
-    fun additionalArgs(args: List<String>): ActConfigBuilder {
+    fun additionalArgs(args: List<String>) = apply {
         this.additionalArgs = args
-        return this
     }
 
-    fun timeout(timeout: Duration?): ActConfigBuilder {
+    fun timeout(timeout: Duration?) = apply {
         this.timeout = timeout
-        return this
     }
 
-    fun envFile(file: File?): ActConfigBuilder {
+    fun envFile(file: File?) = apply {
         this.envFile = file
-        return this
     }
 
-    fun envValues(values: Map<String, String>): ActConfigBuilder {
+    fun envValues(values: Map<String, String>) = apply {
         this.envValues = values
-        return this
     }
 
-    fun envValues(vararg values: Pair<String, String>): ActConfigBuilder {
+    fun envValues(vararg values: Pair<String, String>) = apply {
         this.envValues = mapOf(*values)
-        return this
     }
 
-    fun secretsFile(file: File?): ActConfigBuilder {
+    fun secretsFile(file: File?) = apply {
         this.secretsFile = file
-        return this
     }
 
-    fun secretValues(values: Map<String, String>): ActConfigBuilder {
+    fun secretValues(values: Map<String, String>) = apply {
         this.secretValues = values
-        return this
     }
 
-    fun secretValues(vararg values: Pair<String, String>): ActConfigBuilder {
+    fun secretValues(vararg values: Pair<String, String>) = apply {
         this.secretValues = mapOf(*values)
-        return this
     }
 
-    fun variablesFile(file: File?): ActConfigBuilder {
+    fun variablesFile(file: File?) = apply {
         this.variablesFile = file
-        return this
     }
 
-    fun variableValues(values: Map<String, String>): ActConfigBuilder {
+    fun variableValues(values: Map<String, String>) = apply {
         this.variableValues = values
-        return this
     }
 
-    fun variableValues(vararg values: Pair<String, String>): ActConfigBuilder {
+    fun variableValues(vararg values: Pair<String, String>) = apply {
         this.variableValues = mapOf(*values)
-        return this
     }
 
-    fun inputsFile(file: File?): ActConfigBuilder {
+    fun inputsFile(file: File?) = apply {
         this.inputsFile = file
-        return this
     }
 
-    fun inputValues(values: Map<String, String>): ActConfigBuilder {
+    fun inputValues(values: Map<String, String>) = apply {
         this.inputValues = values
-        return this
     }
 
-    fun inputValues(vararg values: Pair<String, String>): ActConfigBuilder {
+    fun inputValues(vararg values: Pair<String, String>) = apply {
         this.inputValues = mapOf(*values)
-        return this
     }
 
-    fun eventType(type: String?): ActConfigBuilder {
+    fun eventType(type: String?) = apply {
         this.eventType = type
-        return this
     }
 
-    fun eventPayload(eventPayload: File?): ActConfigBuilder {
+    fun eventPayload(eventPayload: File?) = apply {
         this.eventPayload = eventPayload
-        return this
+    }
+
+    fun artifactServer(config: ArtifactServerBuilder.() -> Unit) = apply {
+        artifactServer.apply(config)
+    }
+}
+
+class ArtifactServerBuilder {
+    var enabled: Boolean = false
+    var host: String? = null
+    var port: Int? = null
+    var path: Path? = null
+
+    fun enabled(enabled: Boolean) = apply {
+        this.enabled = enabled
+    }
+
+    fun host(host: String) = apply {
+        this.host = host
+    }
+
+    fun port(port: Int) = apply {
+        this.port = port
+    }
+
+    fun path(path: Path) = apply {
+        this.path = path
     }
 }
