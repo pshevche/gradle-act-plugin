@@ -132,7 +132,7 @@ open class ActExec : DefaultTask() {
 
     @TaskAction
     fun exec() {
-        validateAndFinalizeProperties()
+        finalizeProperties()
         val runner = ActRunner()
         runner.workflow(workflow.get().asFile)
             .job(job.orNull)
@@ -157,7 +157,15 @@ open class ActExec : DefaultTask() {
         runner.exec()
     }
 
-    private fun validateAndFinalizeProperties() {
-        TODO("Not yet implemented")
+    private fun finalizeProperties() {
+        workflow.finalizeValue()
+        job.finalizeValue()
+        env.finalizeValue()
+        actionInputs.finalizeValue()
+        secrets.finalizeValue()
+        variables.finalizeValue()
+        event.finalizeValue()
+        artifactServer.finalizeValue()
+        additionalArgs.finalizeValue()
     }
 }

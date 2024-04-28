@@ -20,4 +20,9 @@ interface ActInputSpec {
     @get:Input
     @get:Optional
     val values: MapProperty<String, String>
+
+    fun finalizeValue() {
+        file.finalizeValue()
+        values.finalizeValue()
+    }
 }
