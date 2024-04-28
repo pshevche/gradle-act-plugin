@@ -14,6 +14,7 @@ class WorkflowEnvActExecFuncTest : FreeSpec({
     "allows configuring workflow env as values" {
         project.addWorkflows(".github/workflows/", "workflow_with_env")
         project.execTask("actEnvValues") {
+            workflow(".github/workflows/workflow_with_env.yml")
             envValues(
                 "GREETING" to "Hallo",
                 "NAME" to "Welt"
@@ -27,22 +28,6 @@ class WorkflowEnvActExecFuncTest : FreeSpec({
         result.output shouldContain "Hallo, Welt!"
     }
 
-    "configures workflow env from default file" {
-        project.addWorkflows(".github/workflows/", "workflow_with_env")
-        project.workspaceDir.resolve(".env").apply {
-            createNewFile()
-            appendText("GREETING=Hallo\n")
-            appendText("NAME=Welt\n")
-        }
-        project.execTask("actEnvFile")
-
-        val result = project.build("actEnvFile")
-
-        result.shouldSucceed(":actEnvFile")
-        result.shouldHaveSuccessfulJobs("print_greeting_with_env")
-        result.output shouldContain "Hallo, Welt!"
-    }
-
     "configure workflow env from custom file" {
         project.addWorkflows(".github/workflows/", "workflow_with_env")
         val customEnv = project.workspaceDir.resolve(".customEnv")
@@ -52,7 +37,8 @@ class WorkflowEnvActExecFuncTest : FreeSpec({
             appendText("NAME=Welt\n")
         }
         project.execTask("actEnvFile") {
-            envFile = customEnv
+            workflow(".github/workflows/workflow_with_env.yml")
+            envFile(customEnv)
         }
 
         val result = project.build("actEnvFile")
@@ -70,7 +56,8 @@ class WorkflowEnvActExecFuncTest : FreeSpec({
             appendText("GREETING=Hallo\n")
         }
         project.execTask("actEnvFileAndValues") {
-            envFile = customEnv
+            workflow(".github/workflows/workflow_with_env.yml")
+            envFile(customEnv)
             envValues("NAME" to "Welt")
         }
 

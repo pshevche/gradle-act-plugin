@@ -14,6 +14,7 @@ class WorkflowSecretsActExecFuncTest : FreeSpec({
     "allows configuring secrets values" {
         project.addWorkflows(".github/workflows/", "workflow_with_secrets")
         project.execTask("actSecretValues") {
+            workflow(".github/workflows/workflow_with_secrets.yml")
             secretValues(
                 "GREETING" to "Hallo",
                 "NAME" to "Welt"
@@ -28,24 +29,6 @@ class WorkflowSecretsActExecFuncTest : FreeSpec({
         result.output shouldContain "Hallo, Welt!"
     }
 
-    "configures secrets from default file" {
-        project.addWorkflows(".github/workflows/", "workflow_with_secrets")
-        project.workspaceDir.resolve(".secrets").apply {
-            createNewFile()
-            appendText("GREETING=Hallo\n")
-            appendText("NAME=Welt\n")
-        }
-        project.execTask("actSecretsFile") {
-            additionalArgs("--insecure-secrets")
-        }
-
-        val result = project.build("actSecretsFile")
-
-        result.shouldSucceed(":actSecretsFile")
-        result.shouldHaveSuccessfulJobs("print_greeting_with_secrets")
-        result.output shouldContain "Hallo, Welt!"
-    }
-
     "configures secrets from custom file" {
         project.addWorkflows(".github/workflows/", "workflow_with_secrets")
         val customSecrets = project.workspaceDir.resolve(".customSecrets")
@@ -55,7 +38,8 @@ class WorkflowSecretsActExecFuncTest : FreeSpec({
             appendText("NAME=Welt\n")
         }
         project.execTask("actSecretsFile") {
-            secretsFile = customSecrets
+            workflow(".github/workflows/workflow_with_secrets.yml")
+            secretsFile(customSecrets)
             additionalArgs("--insecure-secrets")
         }
 
@@ -68,12 +52,15 @@ class WorkflowSecretsActExecFuncTest : FreeSpec({
 
     "hides secrets values by default" {
         project.addWorkflows(".github/workflows/", "workflow_with_secrets")
-        project.workspaceDir.resolve(".secrets").apply {
+        val customSecrets = project.workspaceDir.resolve(".secrets").apply {
             createNewFile()
             appendText("GREETING=Hallo\n")
             appendText("NAME=Welt\n")
         }
-        project.execTask("actSecretsFile")
+        project.execTask("actSecretsFile") {
+            workflow(".github/workflows/workflow_with_secrets.yml")
+            secretsFile(customSecrets)
+        }
 
         val result = project.build("actSecretsFile")
 

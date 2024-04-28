@@ -13,7 +13,9 @@ class CustomEventActExecFuncTest : FreeSpec({
 
     "uses first event type by default" {
         project.addWorkflows(".github/workflows/", "print_event_and_payload")
-        project.execTask("act")
+        project.execTask("act") {
+            workflow(".github/workflows/print_event_and_payload.yml")
+        }
 
         val result = project.build("act")
 
@@ -25,6 +27,7 @@ class CustomEventActExecFuncTest : FreeSpec({
     "allows overriding the event type to trigger the workflow with" {
         project.addWorkflows(".github/workflows/", "print_event_and_payload")
         project.execTask("act") {
+            workflow(".github/workflows/print_event_and_payload.yml")
             eventType("pull_request")
         }
 
@@ -42,6 +45,7 @@ class CustomEventActExecFuncTest : FreeSpec({
             writeText("{ \"author\": \"pshevche\" }")
         }
         project.execTask("act") {
+            workflow(".github/workflows/print_event_and_payload.yml")
             eventType("pull_request")
             eventPayload(eventPayload)
         }

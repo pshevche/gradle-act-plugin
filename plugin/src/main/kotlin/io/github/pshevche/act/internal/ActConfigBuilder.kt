@@ -5,7 +5,7 @@ import java.time.Duration
 
 abstract class ActConfigBuilder {
 
-    var workflows: File? = null
+    var workflow: File? = null
     var job: String? = null
     var additionalArgs: List<String> = listOf()
     var timeout: Duration? = null
@@ -20,8 +20,10 @@ abstract class ActConfigBuilder {
     var eventType: String? = null
     var eventPayload: File? = null
 
-    fun workflows(workflows: File): ActConfigBuilder {
-        this.workflows = workflows
+    fun workflow(workflowPath: String): ActConfigBuilder = workflow(File(workflowPath))
+
+    fun workflow(workflow: File): ActConfigBuilder {
+        this.workflow = workflow
         return this
     }
 

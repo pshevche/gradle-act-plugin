@@ -46,7 +46,7 @@ class ActRunner : ActConfigBuilder() {
         }
 
         add("--workflows")
-        add(workflows!!.path)
+        add(workflow!!.path)
 
         job?.let {
             add("--job")

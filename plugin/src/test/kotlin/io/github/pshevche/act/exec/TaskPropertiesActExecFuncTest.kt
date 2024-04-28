@@ -18,7 +18,9 @@ class TaskPropertiesActExecFuncTest : FreeSpec({
 
     "failing workflow will cause the task to fail" {
         project.addWorkflows(".github/workflows/", "single_failing_job")
-        project.execTask("actFailing")
+        project.execTask("actFailing") {
+            workflow(".github/workflows/single_failing_job.yml")
+        }
 
         val result = project.buildAndFail("actFailing")
 
@@ -29,6 +31,7 @@ class TaskPropertiesActExecFuncTest : FreeSpec({
     "respects the task timeout" {
         project.addWorkflows(".github/workflows/", "hello_world")
         project.execTask("actTimeout") {
+            workflow(".github/workflows/hello_world.yml")
             timeout(Duration.ofMillis(100))
         }
 
@@ -46,7 +49,9 @@ class TaskPropertiesActExecFuncTest : FreeSpec({
     "has the expected cache behavior" - {
         "is never up-to-date" {
             project.addWorkflows(".github/workflows/", "hello_world")
-            project.execTask("actAll")
+            project.execTask("actAll") {
+                workflow(".github/workflows/hello_world.yml")
+            }
 
             var result = project.build("actAll")
             result.shouldSucceed(":actAll")
@@ -59,7 +64,9 @@ class TaskPropertiesActExecFuncTest : FreeSpec({
 
         "works with configuration cache" {
             project.addWorkflows(".github/workflows/", "hello_world")
-            project.execTask("actDefault")
+            project.execTask("actDefault") {
+                workflow(".github/workflows/hello_world.yml")
+            }
 
             var result = project.build("actDefault", "--configuration-cache")
 
