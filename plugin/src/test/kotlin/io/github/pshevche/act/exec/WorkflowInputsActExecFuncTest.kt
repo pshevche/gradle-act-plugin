@@ -14,6 +14,7 @@ class WorkflowInputsActExecFuncTest : FreeSpec({
     "allows settings workflow inputs as values" {
         project.addWorkflows(".github/workflows/", "workflow_with_inputs")
         project.execTask("actInputValues") {
+            workflow(".github/workflows/workflow_with_inputs.yml")
             inputValues(
                 "GREETING" to "Hallo",
                 "NAME" to "Welt"
@@ -27,22 +28,6 @@ class WorkflowInputsActExecFuncTest : FreeSpec({
         result.output shouldContain "Hallo, Welt!"
     }
 
-    "sets workflow inputs from default file" {
-        project.addWorkflows(".github/workflows/", "workflow_with_inputs")
-        project.workspaceDir.resolve(".input").apply {
-            createNewFile()
-            appendText("GREETING=Hallo\n")
-            appendText("NAME=Welt\n")
-        }
-        project.execTask("actInputFile")
-
-        val result = project.build("actInputFile")
-
-        result.shouldSucceed(":actInputFile")
-        result.shouldHaveSuccessfulJobs("print_greeting_with_inputs")
-        result.output shouldContain "Hallo, Welt!"
-    }
-
     "sets workflow inputs from custom file" {
         project.addWorkflows(".github/workflows/", "workflow_with_inputs")
         val customInputs = project.workspaceDir.resolve(".customInput")
@@ -52,7 +37,8 @@ class WorkflowInputsActExecFuncTest : FreeSpec({
             appendText("NAME=Welt\n")
         }
         project.execTask("actInputFile") {
-            inputsFile = customInputs
+            workflow(".github/workflows/workflow_with_inputs.yml")
+            inputsFile(customInputs)
         }
 
         val result = project.build("actInputFile")
@@ -70,7 +56,8 @@ class WorkflowInputsActExecFuncTest : FreeSpec({
             appendText("GREETING=Hallo\n")
         }
         project.execTask("actInputFileAndValues") {
-            inputsFile = customInputs
+            workflow(".github/workflows/workflow_with_inputs.yml")
+            inputsFile(customInputs)
             inputValues("NAME" to "Welt")
         }
 

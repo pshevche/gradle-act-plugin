@@ -1,10 +1,10 @@
 package io.github.pshevche.act
 
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
-import java.io.File
 
 /**
  * A generic specification of various types of workflow inputs like env, secrets, variables or inputs.
@@ -13,9 +13,9 @@ import java.io.File
  */
 interface ActInputSpec {
 
-    @get:Input
+    @get:InputFile
     @get:Optional
-    val file: Property<File>
+    val file: RegularFileProperty
 
     @get:Input
     @get:Optional

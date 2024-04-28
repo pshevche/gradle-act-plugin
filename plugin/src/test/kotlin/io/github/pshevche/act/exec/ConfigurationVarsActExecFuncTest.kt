@@ -14,6 +14,7 @@ class ConfigurationVarsActExecFuncTest : FreeSpec({
     "allows setting configuration vars values" {
         project.addWorkflows(".github/workflows/", "workflow_with_vars")
         project.execTask("actVarValues") {
+            workflow(".github/workflows/workflow_with_vars.yml")
             variableValues(
                 "GREETING" to "Hallo",
                 "NAME" to "Welt"
@@ -27,22 +28,6 @@ class ConfigurationVarsActExecFuncTest : FreeSpec({
         result.output shouldContain "Hallo, Welt!"
     }
 
-    "sets configuration vars from default file" {
-        project.addWorkflows(".github/workflows/", "workflow_with_vars")
-        project.workspaceDir.resolve(".vars").apply {
-            createNewFile()
-            appendText("GREETING=Hallo\n")
-            appendText("NAME=Welt\n")
-        }
-        project.execTask("actVarFile")
-
-        val result = project.build("actVarFile")
-
-        result.shouldSucceed(":actVarFile")
-        result.shouldHaveSuccessfulJobs("print_greeting_with_vars")
-        result.output shouldContain "Hallo, Welt!"
-    }
-
     "sets configuration vars from custom file" {
         project.addWorkflows(".github/workflows/", "workflow_with_vars")
         val customVars = project.workspaceDir.resolve(".customEnv")
@@ -52,7 +37,8 @@ class ConfigurationVarsActExecFuncTest : FreeSpec({
             appendText("NAME=Welt\n")
         }
         project.execTask("actVarFile") {
-            variablesFile = customVars
+            workflow(".github/workflows/workflow_with_vars.yml")
+            variablesFile(customVars)
         }
 
         val result = project.build("actVarFile")
@@ -70,7 +56,8 @@ class ConfigurationVarsActExecFuncTest : FreeSpec({
             appendText("GREETING=Hallo\n")
         }
         project.execTask("actVarFileAndValues") {
-            variablesFile = customVars
+            workflow(".github/workflows/workflow_with_vars.yml")
+            variablesFile(customVars)
             variableValues("NAME" to "Welt")
         }
 

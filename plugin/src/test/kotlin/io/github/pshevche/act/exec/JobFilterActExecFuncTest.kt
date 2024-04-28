@@ -13,6 +13,7 @@ class JobFilterActExecFuncTest : FreeSpec({
     "runs specified job from the workflow" {
         project.addWorkflows(".github/workflows/", "multiple_jobs")
         project.execTask("actAll") {
+            workflow(".github/workflows/multiple_jobs.yml")
             job("print_farewell")
         }
 
@@ -24,7 +25,9 @@ class JobFilterActExecFuncTest : FreeSpec({
 
     "runs all jobs by default" {
         project.addWorkflows(".github/workflows/", "multiple_jobs")
-        project.execTask("actAll")
+        project.execTask("actAll") {
+            workflow(".github/workflows/multiple_jobs.yml")
+        }
 
         val result = project.build("actAll")
 

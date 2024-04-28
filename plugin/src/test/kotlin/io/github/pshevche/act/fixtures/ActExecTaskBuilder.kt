@@ -7,8 +7,8 @@ class ActExecTaskBuilder : ActConfigBuilder() {
     fun toTaskConfig(): String {
         val taskConfigBuilder = StringBuilder()
 
-        workflows?.let {
-            taskConfigBuilder.append("workflows = file('${it.path}')\n")
+        workflow?.let {
+            taskConfigBuilder.append("workflow = file('${it.path}')\n")
         }
 
         job?.let {

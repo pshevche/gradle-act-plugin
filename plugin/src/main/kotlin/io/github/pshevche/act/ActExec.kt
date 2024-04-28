@@ -5,13 +5,14 @@ import io.github.pshevche.act.internal.DefaultActEventSpec
 import io.github.pshevche.act.internal.DefaultActInputSpec
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 
 /**
  * Execute arbitrary GitHub workflows using [nektos/act](https://github.com/nektos/act).
@@ -25,10 +26,8 @@ open class ActExec : DefaultTask() {
     /**
      * Path to workflow file(s) (default ".github/workflows").
      */
-    @get:Input
-    @get:Optional
-    val workflows: Property<File> =
-        objects.property(File::class.java).convention(projectDir.dir(".github/workflows").asFile)
+    @get:InputFile
+    val workflow: RegularFileProperty = objects.fileProperty()
 
     /**
      * Job ID to execute (run all jobs by default).
@@ -43,7 +42,7 @@ open class ActExec : DefaultTask() {
      */
     @get:Nested
     @get:Optional
-    val env: ActInputSpec = DefaultActInputSpec(objects, projectDir.file(".env").asFile)
+    val env: ActInputSpec = DefaultActInputSpec(objects)
 
     /**
      * Env to make available to actions.
@@ -57,7 +56,7 @@ open class ActExec : DefaultTask() {
      */
     @get:Nested
     @get:Optional
-    val actionInputs: ActInputSpec = DefaultActInputSpec(objects, projectDir.file(".input").asFile)
+    val actionInputs: ActInputSpec = DefaultActInputSpec(objects)
 
     /**
      * Inputs to make available to actions.
@@ -71,7 +70,7 @@ open class ActExec : DefaultTask() {
      */
     @get:Nested
     @get:Optional
-    val secrets: ActInputSpec = DefaultActInputSpec(objects, projectDir.file(".secrets").asFile)
+    val secrets: ActInputSpec = DefaultActInputSpec(objects)
 
     /**
      * Secrets to make available to actions.
@@ -85,7 +84,7 @@ open class ActExec : DefaultTask() {
      */
     @get:Nested
     @get:Optional
-    val variables: ActInputSpec = DefaultActInputSpec(objects, projectDir.file(".vars").asFile)
+    val variables: ActInputSpec = DefaultActInputSpec(objects)
 
     /**
      * Variables to make available to actions.
@@ -115,19 +114,19 @@ open class ActExec : DefaultTask() {
     @TaskAction
     fun exec() {
         val runner = ActRunner()
-        runner.workflows(workflows.get())
+        runner.workflow(workflow.get().asFile)
             .job(job.orNull)
-            .envFile(env.file.orNull)
+            .envFile(env.file.asFile.orNull)
             .envValues(env.values.get())
-            .inputsFile(actionInputs.file.orNull)
+            .inputsFile(actionInputs.file.asFile.orNull)
             .inputValues(actionInputs.values.get())
-            .secretsFile(secrets.file.orNull)
+            .secretsFile(secrets.file.asFile.orNull)
             .secretValues(secrets.values.get())
-            .variablesFile(variables.file.orNull)
+            .variablesFile(variables.file.asFile.orNull)
             .variableValues(variables.values.get())
             .additionalArgs(additionalArgs.get())
             .eventType(event.type.orNull)
-            .eventPayload(event.payload.orNull)
+            .eventPayload(event.payload.asFile.orNull)
             .timeout(timeout.orNull)
         runner.exec()
     }

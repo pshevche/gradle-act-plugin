@@ -14,7 +14,7 @@ class AdditionalArgsActExecFuncTest : FreeSpec({
     "allows passing arbitrary additional arguments to act" {
         project.addWorkflows("workflows/", "hello_world", "goodbye_world")
         project.execTask("actList") {
-            workflows(project.workspaceDir.resolve("workflows/hello_world.yml"))
+            workflow(project.workspaceDir.resolve("workflows/hello_world.yml"))
             additionalArgs("--list")
         }
 
