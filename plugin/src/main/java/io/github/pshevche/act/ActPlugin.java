@@ -1,11 +1,12 @@
 package io.github.pshevche.act;
 
-import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 
 /**
- * A simple 'hello world' plugin.
+ * Gradle plugin for validating GitHub actions using <a href="https://github.com/nektos/act">nektos/act</a>.
  */
+@SuppressWarnings("unused")
 public class ActPlugin implements Plugin<Project> {
     public void apply(Project project) {
         // Register a task
