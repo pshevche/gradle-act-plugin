@@ -18,13 +18,13 @@ java {
     }
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 gradlePlugin {
     val act by plugins.creating {
         id = "io.github.pshevche.act"
         implementationClass = "io.github.pshevche.act.ActPlugin"
     }
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
