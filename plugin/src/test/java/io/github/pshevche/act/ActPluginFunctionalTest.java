@@ -1,4 +1,4 @@
-package io.github.pshevche;
+package io.github.pshevche.act;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * A simple functional test for the 'io.github.pshevche.greeting' plugin.
  */
-class GradleActPluginPluginFunctionalTest {
+class ActPluginFunctionalTest {
     @TempDir
     File projectDir;
 

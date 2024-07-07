@@ -1,4 +1,4 @@
-package io.github.pshevche;
+package io.github.pshevche.act;
 
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
@@ -6,7 +6,7 @@ import org.gradle.api.Plugin;
 /**
  * A simple 'hello world' plugin.
  */
-public class GradleActPluginPlugin implements Plugin<Project> {
+public class ActPlugin implements Plugin<Project> {
     public void apply(Project project) {
         // Register a task
         project.getTasks().register("greeting", task -> {

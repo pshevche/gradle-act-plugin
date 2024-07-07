@@ -1,4 +1,4 @@
-package io.github.pshevche;
+package io.github.pshevche.act;
 
 import org.gradle.testfixtures.ProjectBuilder;
 import org.gradle.api.Project;
@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * A simple unit test for the 'io.github.pshevche.greeting' plugin.
  */
-class GradleActPluginPluginTest {
+class ActPluginTest {
     @Test void pluginRegistersATask() {
         // Create a test project and apply the plugin
         Project project = ProjectBuilder.builder().build();
