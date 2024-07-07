@@ -1,5 +1,5 @@
-
 plugins {
+    idea
     `java-gradle-plugin`
 }
 
@@ -9,8 +9,13 @@ repositories {
 
 dependencies {
     testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
+}
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 gradlePlugin {
@@ -20,24 +25,6 @@ gradlePlugin {
     }
 }
 
-val functionalTestSourceSet = sourceSets.create("functionalTest") {
-}
-
-configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
-configurations["functionalTestRuntimeOnly"].extendsFrom(configurations["testRuntimeOnly"])
-
-val functionalTest by tasks.registering(Test::class) {
-    testClassesDirs = functionalTestSourceSet.output.classesDirs
-    classpath = functionalTestSourceSet.runtimeClasspath
-    useJUnitPlatform()
-}
-
-gradlePlugin.testSourceSets.add(functionalTestSourceSet)
-
-tasks.named<Task>("check") {
-    dependsOn(functionalTest)
-}
-
-tasks.named<Test>("test") {
+tasks.test {
     useJUnitPlatform()
 }
