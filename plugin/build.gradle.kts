@@ -1,6 +1,7 @@
 plugins {
     idea
     `java-gradle-plugin`
+    alias(libs.plugins.kotlin)
 }
 
 repositories {
@@ -9,6 +10,8 @@ repositories {
 
 dependencies {
     testImplementation(libs.junit.jupiter)
+    testImplementation(libs.kotest.runner)
+    testImplementation(libs.kotest.assertions)
     testRuntimeOnly(libs.junit.platform.launcher)
 }
 
