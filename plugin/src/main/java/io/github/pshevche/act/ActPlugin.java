@@ -9,9 +9,7 @@ import org.gradle.api.Project;
 @SuppressWarnings("unused")
 public class ActPlugin implements Plugin<Project> {
     public void apply(Project project) {
-        // Register a task
-        project.getTasks().register("greeting", task -> {
-            task.doLast(s -> System.out.println("Hello from plugin 'io.github.pshevche.greeting'"));
-        });
+        var actExtension = project.getExtensions().create("act", ActExtension.class);
+        project.getTasks().register("actTest", ActTest.class, actExtension.getWorkflowsRoot(), actExtension.getSpecsRoot());
     }
 }
