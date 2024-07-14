@@ -63,8 +63,8 @@ class ActTestSpecParserTest : FreeSpec({
     }
 
     "fails if workflow does not exist in the workflows root" {
-        specFile.writeText("workflow: non-existent.yml")
-        parseWithFailures("The workflow file 'non-existent.yml' does not exist in the workflows root directory")
+        specFile.writeText("workflow: non_existent.yml")
+        parseWithFailures("The workflow file 'non_existent.yml' does not exist in the workflows root directory")
     }
 
     "handles optional parameters" {
@@ -231,7 +231,7 @@ class ActTestSpecParserTest : FreeSpec({
 
     "can configure workflow resources" - {
         withData(
-            nameFn = { "$it with default settings" },
+            nameFn = { "$it requires a storage directory" },
             "artifactServer",
             "cacheServer"
         ) { resourceType ->
@@ -244,28 +244,8 @@ class ActTestSpecParserTest : FreeSpec({
             """.trimIndent()
             )
 
-            val expectedSpec = when (resourceType) {
-                "artifactServer" -> actSpec(
-                    resources = ActTestSpecResources(
-                        ActTestSpecResource(
-                            true,
-                            null,
-                            null,
-                            null
-                        ), null
-                    )
-                )
 
-                "cacheServer" -> actSpec(
-                    resources = ActTestSpecResources(
-                        null,
-                        ActTestSpecResource(true, null, null, null)
-                    )
-                )
-
-                else -> throw IllegalArgumentException("Unexpected workflow input type")
-            }
-            parser.parse(specFile) shouldBeEqual expectedSpec
+            parseWithFailures("The directory for storing ${if (resourceType == "artifactServer") "artifact server" else "cache server"} data must be provided if resource is enabled")
         }
 
         withData(
@@ -340,6 +320,18 @@ class ActTestSpecParserTest : FreeSpec({
         parser.parse(specFile) shouldBeEqual actSpec(description = "My first ever workflow spec file!")
     }
 
+    "captures all violation errors" {
+        specFile.writeText(
+            """
+            workflow: non_existent.yml
+            event: 
+                payload: non_existent.json
+        """.trimIndent()
+        )
+        parseWithFailures(
+            "The workflow file 'non_existent.yml' does not exist in the workflows root directory",
+            "The event payload file 'non_existent.json' does not exist in the specs root directory"
+        )
+    }
+
 })
-
-

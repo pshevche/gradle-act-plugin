@@ -37,7 +37,7 @@ public abstract class ActTest extends DefaultTask {
         var specParser = createSpecParser();
         specs.stream()
                 .map(specParser::parse)
-                .forEach(ActTestSpecRunner::run);
+                .forEach(ActTestSpecRunner::exec);
     }
 
     private Set<File> findSpecFiles() {

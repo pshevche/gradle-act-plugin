@@ -59,7 +59,7 @@ public class ActTestSpecParser {
                 toWorkflowInputs(specYaml.getSecrets(), validator),
                 toWorkflowInputs(specYaml.getVariables(), validator),
                 nullToEmpty(specYaml.getMatrix()),
-                toWorkflowResources(specYaml.getResources()),
+                toWorkflowResources(specYaml.getResources(), validator),
                 nullToEmpty(specYaml.getAdditionalArgs()),
                 specYaml.getDescription()
         );
@@ -115,24 +115,30 @@ public class ActTestSpecParser {
     }
 
     @Nullable
-    private ActTestSpecResources toWorkflowResources(@Nullable ActTestSpecResourcesYaml resources) {
+    private ActTestSpecResources toWorkflowResources(@Nullable ActTestSpecResourcesYaml resources, Validator validator) {
         return Optional.ofNullable(resources)
                 .map(it -> new ActTestSpecResources(
-                        toWorkflowResource(it.getArtifactServer()),
-                        toWorkflowResource(it.getCacheServer())
+                        toWorkflowResource(it.getArtifactServer(), "artifact server", validator),
+                        toWorkflowResource(it.getCacheServer(), "cache server", validator)
                 ))
                 .orElse(null);
     }
 
     @Nullable
-    private ActTestSpecResource toWorkflowResource(@Nullable ActTestSpecResourceYaml resource) {
+    private ActTestSpecResource toWorkflowResource(@Nullable ActTestSpecResourceYaml resource, String description, Validator validator) {
         return Optional.ofNullable(resource)
-                .map(it -> new ActTestSpecResource(
-                        it.isEnabled(),
-                        it.getStorage() == null ? null : Paths.get(it.getStorage()),
-                        it.getHost(),
-                        it.getPort()
-                ))
+                .map(it -> {
+                    validator.validate(
+                            it.getStorage() != null,
+                            "The directory for storing " + description + " data must be provided if resource is enabled"
+                    );
+                    return new ActTestSpecResource(
+                            it.isEnabled(),
+                            it.getStorage() == null ? null : Paths.get(it.getStorage()),
+                            it.getHost(),
+                            it.getPort()
+                    );
+                })
                 .orElse(null);
     }
 

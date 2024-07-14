@@ -5,7 +5,7 @@ import java.nio.file.Path;
 
 public record ActTestSpecResource(
         boolean enabled,
-        @Nullable Path storage,
+        Path storage,
         @Nullable String host,
         @Nullable Integer port
 ) {
