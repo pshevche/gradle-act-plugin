@@ -12,6 +12,7 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner)
     testImplementation(libs.kotest.assertions)
+    testImplementation(libs.kotest.dataset)
     testRuntimeOnly(libs.junit.platform.launcher)
 }
 

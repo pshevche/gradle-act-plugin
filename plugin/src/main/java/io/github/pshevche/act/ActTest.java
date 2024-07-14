@@ -34,8 +34,9 @@ public abstract class ActTest extends DefaultTask {
             return;
         }
 
+        var specParser = createSpecParser();
         specs.stream()
-                .map(ActTestSpecParser::parse)
+                .map(specParser::parse)
                 .forEach(ActTestSpecRunner::run);
     }
 
@@ -50,5 +51,12 @@ public abstract class ActTest extends DefaultTask {
             var matcher = SPEC_FILE_EXTENSION.matcher(include.getPath());
             return matcher.matches();
         });
+    }
+
+    private ActTestSpecParser createSpecParser() {
+        return new ActTestSpecParser(
+                workflowsRoot.getAsFile().get().toPath(),
+                specsRoot.getAsFile().get().toPath()
+        );
     }
 }
