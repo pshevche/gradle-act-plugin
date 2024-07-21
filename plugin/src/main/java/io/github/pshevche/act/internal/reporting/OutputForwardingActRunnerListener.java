@@ -14,7 +14,7 @@ public class OutputForwardingActRunnerListener implements ActTestSpecRunnerListe
 
     @Override
     public void onOutput(TestDescriptor.SpecDescriptor spec, String line) {
-        logger.info(line);
+        logger.lifecycle(line);
     }
 
     @Override

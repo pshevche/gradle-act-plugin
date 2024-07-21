@@ -3,6 +3,7 @@ package io.github.pshevche.act
 import io.github.pshevche.act.fixtures.GradleProject
 import io.github.pshevche.act.fixtures.assertEvents
 import io.kotest.core.spec.style.FreeSpec
+import io.kotest.datatest.withData
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -97,11 +98,11 @@ class ActTestCoreFuncTest : FreeSpec({
         project.testAndFail()
 
         assertEvents(project.xmlReport()) {
-            spec(name = "always passing workflow", result = SUCCESSFUL) {
-                job(name = "successful_job", result = SUCCESSFUL)
-            }
             spec(name = "always failing workflow", result = FAILED) {
                 job(name = "failing_job", result = FAILED)
+            }
+            spec(name = "always passing workflow", result = SUCCESSFUL) {
+                job(name = "successful_job", result = SUCCESSFUL)
             }
         }
     }
@@ -152,12 +153,31 @@ class ActTestCoreFuncTest : FreeSpec({
         project.test()
 
         assertEvents(project.xmlReport()) {
-            spec(name = "YML spec", result = SUCCESSFUL) {
-                job(name = "successful_job", result = SUCCESSFUL)
-            }
             spec(name = "YAML spec", result = SUCCESSFUL) {
                 job(name = "successful_job", result = SUCCESSFUL)
             }
+            spec(name = "YML spec", result = SUCCESSFUL) {
+                job(name = "successful_job", result = SUCCESSFUL)
+            }
         }
+    }
+
+    withData(
+        nameFn = { "output forwarding can be enabled via a system property ($it)" },
+        false,
+        true
+    ) { enabled ->
+        project.addWorkflow("always_passing_workflow")
+        project.addSpec(
+        "passing.act.yml", """
+            name: always passing workflow
+            workflow: always_passing_workflow.yml
+        """.trimIndent()
+        )
+
+        val args = if (enabled) listOf("-Dact.forwardOutput=true") else listOf()
+        val result = project.test(*args.toTypedArray())
+
+        result.output.contains("Hello, World!") shouldBe enabled
     }
 })
