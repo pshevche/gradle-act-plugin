@@ -2,10 +2,12 @@ package io.github.pshevche.act.fixtures
 
 import io.kotest.core.listeners.BeforeTestListener
 import io.kotest.core.test.TestCase
-import org.gradle.internal.impldep.com.google.common.io.Files
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import java.io.File
+import java.nio.file.Files
 
 class GradleProject(private val workspaceDir: File) : BeforeTestListener {
 
@@ -16,6 +18,10 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
 
     override suspend fun beforeTest(testCase: TestCase) {
         cleanWorkspace()
+        withContext(Dispatchers.IO) {
+            Files.createDirectories(workflowsRoot.toPath())
+            Files.createDirectories(specsRoot.toPath())
+        }
         settingsFile.writeText("")
         buildFile.writeText(
             """
@@ -35,13 +41,13 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
 
     fun addWorkflow(workflowName: String, targetLocation: String = "$workflowName.yml") {
         val workflowFile = workflowsRoot.resolve(targetLocation)
-        Files.createParentDirs(workflowFile)
+        Files.createDirectories(workflowFile.toPath().parent)
         copyWorkflowContent(workflowFile, workflowName)
     }
 
     fun addSpec(filePath: String, content: String) {
         val specFile = specsRoot.resolve(filePath)
-        Files.createParentDirs(specFile)
+        Files.createDirectories(specFile.toPath().parent)
         specFile.writeText(content)
     }
 

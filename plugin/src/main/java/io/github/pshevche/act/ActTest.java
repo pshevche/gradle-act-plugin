@@ -23,17 +23,17 @@ import org.gradle.api.tasks.VerificationException;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @CacheableTask
 public abstract class ActTest extends DefaultTask {
 
     private static final String FORWARD_ACT_OUTPUT_SYS_PROP = "act.forwardOutput";
     private static final Pattern SPEC_FILE_EXTENSION = Pattern.compile(".*\\.act\\.(yml|yaml)$");
+    private static final Comparator<File> SPEC_FILE_COMPARATOR = Comparator.comparing(File::getAbsolutePath);
 
     private final DirectoryProperty workflowsRoot;
     private final DirectoryProperty specsRoot;
@@ -119,12 +119,13 @@ public abstract class ActTest extends DefaultTask {
                 .getOrElse(false);
     }
 
-    private Set<File> findSpecFiles() {
+    private List<File> findSpecFiles() {
         return specsRoot.getAsFileTree()
                 .getFiles()
                 .stream()
                 .filter(ActTest::isActSpecFile)
-                .collect(Collectors.toSet());
+                .sorted(SPEC_FILE_COMPARATOR)
+                .toList();
     }
 
     private static boolean isActSpecFile(File file) {
