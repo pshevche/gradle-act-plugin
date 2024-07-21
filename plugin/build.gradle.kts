@@ -9,6 +9,9 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.open.test.reporting)
+    implementation(libs.freemarker)
+
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner)
     testImplementation(libs.kotest.assertions)
