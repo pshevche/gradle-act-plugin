@@ -133,4 +133,31 @@ class ActTestCoreFuncTest : FreeSpec({
             }
         }
     }
+
+    "supports both YML and YAML spec extensions" {
+        project.addWorkflow("always_passing_workflow")
+        project.addSpec(
+            "passing_yml.act.yml", """
+            name: YML spec
+            workflow: always_passing_workflow.yml
+        """.trimIndent()
+        )
+        project.addSpec(
+            "passing_yml.act.yaml", """
+            name: YAML spec
+            workflow: always_passing_workflow.yml
+        """.trimIndent()
+        )
+
+        project.test()
+
+        assertEvents(project.xmlReport()) {
+            spec(name = "YML spec", result = SUCCESSFUL) {
+                job(name = "successful_job", result = SUCCESSFUL)
+            }
+            spec(name = "YAML spec", result = SUCCESSFUL) {
+                job(name = "successful_job", result = SUCCESSFUL)
+            }
+        }
+    }
 })
