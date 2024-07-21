@@ -4,7 +4,6 @@ import io.github.pshevche.act.internal.ActException;
 import io.github.pshevche.act.internal.ActTestSpecRunner;
 import io.github.pshevche.act.internal.ActTestSpecRunnerListener;
 import io.github.pshevche.act.internal.CompositeActTestSpecRunnerListener;
-import io.github.pshevche.act.internal.TestDescriptor;
 import io.github.pshevche.act.internal.TestDescriptor.SpecDescriptor;
 import io.github.pshevche.act.internal.reporting.ActTestReporter;
 import io.github.pshevche.act.internal.reporting.CompositeActTestReporter;
@@ -13,18 +12,24 @@ import io.github.pshevche.act.internal.reporting.OutputForwardingActRunnerListen
 import io.github.pshevche.act.internal.reporting.ReportingActRunnerListener;
 import io.github.pshevche.act.internal.reporting.XmlActTestReporter;
 import io.github.pshevche.act.internal.spec.ActTestSpecParser;
-import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.tasks.CacheableTask;
+import org.gradle.api.tasks.Classpath;
+import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.tasks.util.PatternFilterable;
+import org.gradle.api.tasks.VerificationException;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+@CacheableTask
 public abstract class ActTest extends DefaultTask {
 
     private static final String FORWARD_ACT_OUTPUT_SYS_PROP = "act.forwardOutput";
@@ -35,20 +40,38 @@ public abstract class ActTest extends DefaultTask {
     private final DirectoryProperty reportsDir;
 
     @Inject
-    ActTest(DirectoryProperty workflowsRoot, DirectoryProperty specsRoot) {
+    public ActTest(DirectoryProperty workflowsRoot, DirectoryProperty specsRoot) {
         this.workflowsRoot = workflowsRoot;
         this.specsRoot = specsRoot;
         this.reportsDir = getProject().getObjects().directoryProperty().convention(getProject().getLayout().getBuildDirectory().dir("reports/act"));
+    }
+
+    @InputDirectory
+    @Classpath
+    public DirectoryProperty getWorkflowsRoot() {
+        return workflowsRoot;
+    }
+
+    @InputDirectory
+    @Classpath
+    public DirectoryProperty getSpecsRoot() {
+        return specsRoot;
+    }
+
+    @OutputDirectory
+    public DirectoryProperty getReportsDir() {
+        return reportsDir;
     }
 
     @TaskAction
     void test() {
         var specs = findSpecFiles();
         if (specs.isEmpty()) {
-            getLogger().warn("Act plugin did not detect any specs to execute in '{}'. Make sure your specs are defined in files ending with *.act.yml or *.act.yaml", specsRoot.get().getAsFile().getAbsolutePath());
+            getLogger().warn("Act plugin has not detected any specs to execute in '{}'. Make sure your specs are defined in files ending with *.act.yml or *.act.yaml", specsRoot.get().getAsFile().getAbsolutePath());
             return;
         }
 
+        var failed = new AtomicBoolean(false);
         var specParser = createSpecParser();
         try (var reporter = createActTestReporter()) {
             var listener = createRunnerListener(reporter);
@@ -65,12 +88,17 @@ public abstract class ActTest extends DefaultTask {
                         if (execResult == ActTestSpecRunner.ActExecResult.PASSED) {
                             reporter.reportSpecFinishedSuccessfully(specDescriptor);
                         } else {
+                            failed.set(true);
                             reporter.reportSpecFinishedWithFailure(specDescriptor);
                         }
                     });
             reporter.reportTestExecutionFinished();
         } catch (Exception e) {
             throw new ActException(e);
+        }
+
+        if (failed.get()) {
+            throw new VerificationException("There were failing workflow executions. See the report at: file://%s".formatted(reportsDir.file("test.html").get().getAsFile().toPath()));
         }
     }
 
@@ -93,15 +121,15 @@ public abstract class ActTest extends DefaultTask {
 
     private Set<File> findSpecFiles() {
         return specsRoot.getAsFileTree()
-                .matching(isActSpecFile())
-                .getFiles();
+                .getFiles()
+                .stream()
+                .filter(ActTest::isActSpecFile)
+                .collect(Collectors.toSet());
     }
 
-    private static Action<PatternFilterable> isActSpecFile() {
-        return patterns -> patterns.include(include -> {
-            var matcher = SPEC_FILE_EXTENSION.matcher(include.getPath());
-            return matcher.matches();
-        });
+    private static boolean isActSpecFile(File file) {
+        var matcher = SPEC_FILE_EXTENSION.matcher(file.getPath());
+        return matcher.matches();
     }
 
     private ActTestSpecParser createSpecParser() {

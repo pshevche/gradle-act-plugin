@@ -11,6 +11,7 @@ repositories {
 dependencies {
     implementation(libs.open.test.reporting)
     implementation(libs.freemarker)
+    implementation(libs.snakeyaml)
 
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.runner)
@@ -27,6 +28,10 @@ java {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.register("example") {
+    inputs.files(tasks.test.get().outputs)
 }
 
 gradlePlugin {

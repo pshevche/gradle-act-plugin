@@ -6,9 +6,9 @@ import io.github.pshevche.act.internal.spec.yaml.ActTestSpecInputYaml;
 import io.github.pshevche.act.internal.spec.yaml.ActTestSpecResourceYaml;
 import io.github.pshevche.act.internal.spec.yaml.ActTestSpecResourcesYaml;
 import io.github.pshevche.act.internal.spec.yaml.ActTestSpecYaml;
-import org.gradle.internal.impldep.org.yaml.snakeyaml.LoaderOptions;
-import org.gradle.internal.impldep.org.yaml.snakeyaml.Yaml;
-import org.gradle.internal.impldep.org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 import javax.annotation.Nullable;
 import java.io.File;

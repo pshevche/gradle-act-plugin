@@ -32,14 +32,15 @@ public class ActTestSpecRunner {
 
     public ActExecResult exec(ActTestSpec spec) {
         try {
-            executeSpecWithListenerNotification(spec).waitFor();
+            var exitCode = executeSpecWithListenerNotification(spec).waitFor();
+            return exitCode == 0 ? ActExecResult.PASSED : ActExecResult.FAILED;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (Exception e) {
             return ActExecResult.FAILED;
         }
 
-        return ActExecResult.PASSED;
+        return ActExecResult.FAILED;
     }
 
     private Process executeSpecWithListenerNotification(ActTestSpec spec) throws IOException {
@@ -70,7 +71,7 @@ public class ActTestSpecRunner {
         var cmd = new ArrayList<String>();
         cmd.add("act");
         addEvent(cmd, spec.event());
-        addIfPresent(cmd, spec.workflow(), "workflow");
+        addIfPresent(cmd, spec.workflow(), "workflows");
         addIfPresent(cmd, spec.job(), "job");
         addInputs(cmd, spec.env(), "env-file", "env");
         addInputs(cmd, spec.inputs(), "input-file", "input");

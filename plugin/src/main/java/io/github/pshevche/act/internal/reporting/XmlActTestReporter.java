@@ -8,6 +8,7 @@ import org.opentest4j.reporting.events.core.Result.Status;
 import org.opentest4j.reporting.events.root.Events;
 import org.opentest4j.reporting.schema.Namespace;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 
@@ -18,12 +19,14 @@ import static org.opentest4j.reporting.events.root.RootFactory.started;
 
 public class XmlActTestReporter extends AbstractActTestReporter {
 
-    private final Path reportFile;
     private final DocumentWriter<Events> writer;
     private final ActTestIdStore idStore = new ActTestIdStore();
 
     public XmlActTestReporter(Path reportFile) throws Exception {
-        this.reportFile = reportFile;
+        if (!reportFile.toFile().exists()) {
+            Files.createDirectories(reportFile.getParent());
+            Files.createFile(reportFile);
+        }
         this.writer = Events.createDocumentWriter(
                 NamespaceRegistry.builder(Namespace.REPORTING_CORE)
                         .add("e", Namespace.REPORTING_EVENTS)
