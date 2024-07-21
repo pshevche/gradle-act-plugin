@@ -13,6 +13,7 @@ import org.gradle.internal.impldep.org.yaml.snakeyaml.constructor.Constructor;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ public class ActTestSpecParser {
     private ActTestSpec validateAndResolve(File specFile, ActTestSpecYaml specYaml) {
         var validator = new Validator(specFile);
         var actTestSpec = new ActTestSpec(
+                toWorkflowName(specYaml.getName(), validator),
                 toWorkflowPath(specYaml.getWorkflow(), validator),
                 specYaml.getJob(),
                 toWorkflowEvent(specYaml.getEvent(), validator),
@@ -60,11 +62,18 @@ public class ActTestSpecParser {
                 toWorkflowInputs(specYaml.getVariables(), validator),
                 nullToEmpty(specYaml.getMatrix()),
                 toWorkflowResources(specYaml.getResources(), validator),
-                nullToEmpty(specYaml.getAdditionalArgs()),
-                specYaml.getDescription()
+                nullToEmpty(specYaml.getAdditionalArgs())
         );
         validator.throwIfFailed();
         return actTestSpec;
+    }
+
+    private String toWorkflowName(@Nullable String name, Validator validator) {
+        validator.validate(
+                name != null,
+                "Spec file must contain a 'name' property"
+        );
+        return name;
     }
 
     private Path toWorkflowPath(@Nullable String workflow, Validator validator) {
@@ -77,7 +86,7 @@ public class ActTestSpecParser {
                 .map(workflowsRoot::resolve)
                 .map(it -> {
                     validator.validate(
-                            it.toFile().exists(),
+                            Files.exists(it.toAbsolutePath()) && Files.isRegularFile(it.toAbsolutePath()),
                             "The workflow file '%s' does not exist in the workflows root directory".formatted(workflow)
                     );
                     return it;
@@ -92,7 +101,7 @@ public class ActTestSpecParser {
                 .map(it -> {
                     var payloadFile = it.getPayload() == null ? null : specsRoot.resolve(it.getPayload());
                     validator.validate(
-                            payloadFile == null || payloadFile.toFile().exists(),
+                            payloadFile == null || (Files.exists(payloadFile.toAbsolutePath()) && Files.isRegularFile(payloadFile.toAbsolutePath())),
                             "The event payload file '%s' does not exist in the specs root directory".formatted(event.getPayload())
                     );
                     return new ActTestSpecEvent(event.getType(), payloadFile);
@@ -106,7 +115,7 @@ public class ActTestSpecParser {
                 .map(it -> {
                     var valuesFile = it.getFile() == null ? null : specsRoot.resolve(it.getFile());
                     validator.validate(
-                            valuesFile == null || specsRoot.resolve(it.getFile()).toFile().exists(),
+                            valuesFile == null || (Files.exists(valuesFile.toAbsolutePath()) && Files.isRegularFile(valuesFile.toAbsolutePath())),
                             "The input values file '%s' does not exist in the specs root directory".formatted(it.getFile())
                     );
                     return new ActTestSpecInput(valuesFile, nullToEmpty(inputs.getValues()));

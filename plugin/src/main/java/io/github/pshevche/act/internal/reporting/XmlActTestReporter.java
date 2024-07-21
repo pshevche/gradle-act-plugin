@@ -16,13 +16,13 @@ import static org.opentest4j.reporting.events.core.Result.Status.SUCCESSFUL;
 import static org.opentest4j.reporting.events.root.RootFactory.finished;
 import static org.opentest4j.reporting.events.root.RootFactory.started;
 
-class XmlActTestReporter extends AbstractActTestReporter {
+public class XmlActTestReporter extends AbstractActTestReporter {
 
     private final Path reportFile;
     private final DocumentWriter<Events> writer;
     private final ActTestIdStore idStore = new ActTestIdStore();
 
-    XmlActTestReporter(Path reportFile) throws Exception {
+    public XmlActTestReporter(Path reportFile) throws Exception {
         this.reportFile = reportFile;
         this.writer = Events.createDocumentWriter(
                 NamespaceRegistry.builder(Namespace.REPORTING_CORE)

@@ -2,7 +2,7 @@ package io.github.pshevche.act.internal.reporting;
 
 import io.github.pshevche.act.internal.TestDescriptor;
 
-interface ActTestReporter extends AutoCloseable {
+public interface ActTestReporter extends AutoCloseable {
 
     void reportTestExecutionStarted();
 

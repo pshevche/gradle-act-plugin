@@ -7,24 +7,32 @@ import io.github.pshevche.act.internal.spec.ActTestSpecResource;
 import io.github.pshevche.act.internal.spec.ActTestSpecResources;
 
 import javax.annotation.Nullable;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class ActTestSpecRunner {
+
+    private final ActTestSpecRunnerListener listener;
+
+    public ActTestSpecRunner(ActTestSpecRunnerListener listener) {
+        this.listener = listener;
+    }
 
     public enum ActExecResult {
         PASSED,
         FAILED
     }
 
-    public static ActExecResult exec(ActTestSpec spec) {
+    public ActExecResult exec(ActTestSpec spec) {
         try {
-            new ProcessBuilder()
-                    .command(cmd(spec))
-                    .start()
-                    .waitFor();
+            executeSpecWithListenerNotification(spec).waitFor();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (Exception e) {
@@ -32,6 +40,30 @@ public class ActTestSpecRunner {
         }
 
         return ActExecResult.PASSED;
+    }
+
+    private Process executeSpecWithListenerNotification(ActTestSpec spec) throws IOException {
+        var specDescriptor = new TestDescriptor.SpecDescriptor(spec.name());
+        var process = new ProcessBuilder()
+                .command(cmd(spec))
+                .start();
+
+        notifyListenersOnOutput(process.getInputStream(), it -> listener.onOutput(specDescriptor, it));
+        notifyListenersOnOutput(process.getErrorStream(), it -> listener.onError(specDescriptor, it));
+
+        return process;
+    }
+
+    private void notifyListenersOnOutput(InputStream stream, Consumer<String> lineConsumer) {
+        try (var reader = new BufferedReader(new InputStreamReader(stream))) {
+            var line = reader.readLine();
+            while (line != null) {
+                lineConsumer.accept(line);
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
+            throw new ActException("Failed to consume act output", e);
+        }
     }
 
     private static List<String> cmd(ActTestSpec spec) {

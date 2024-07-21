@@ -7,12 +7,12 @@ import io.github.pshevche.act.internal.TestDescriptor.SpecDescriptor;
 import java.util.HashMap;
 import java.util.Map;
 
-class ReportingActRunnerListener implements ActTestSpecRunnerListener {
+public class ReportingActRunnerListener implements ActTestSpecRunnerListener {
 
     private final ActTestReporter reporter;
     private final Map<JobDescriptor, StringBuilder> outputByJob = new HashMap<>();
 
-    ReportingActRunnerListener(ActTestReporter reporter) {
+    public ReportingActRunnerListener(ActTestReporter reporter) {
         this.reporter = reporter;
     }
 

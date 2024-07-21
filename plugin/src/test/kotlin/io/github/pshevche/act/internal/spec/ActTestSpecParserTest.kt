@@ -32,6 +32,7 @@ class ActTestSpecParserTest : FreeSpec({
     }
 
     fun actSpec(
+        name: String? = null,
         workflow: Path = workflowsRoot.resolve("workflow.yml").toPath(),
         job: String? = null,
         event: ActTestSpecEvent? = null,
@@ -41,9 +42,9 @@ class ActTestSpecParserTest : FreeSpec({
         variables: ActTestSpecInput? = null,
         matrix: Map<String, Any> = emptyMap(),
         resources: ActTestSpecResources? = null,
-        additionalArgs: List<String> = emptyList(),
-        description: String? = null
+        additionalArgs: List<String> = emptyList()
     ) = ActTestSpec(
+        name,
         workflow,
         job,
         event,
@@ -53,33 +54,53 @@ class ActTestSpecParserTest : FreeSpec({
         variables,
         matrix,
         resources,
-        additionalArgs,
-        description
+        additionalArgs
     )
 
+    "fails if spec name is absent" {
+        specFile.writeText("workflow: workflow.yml")
+        parseWithFailures("Spec file must contain a 'name' property")
+    }
+
     "fails if workflow path is absent" {
-        specFile.writeText("description: something")
+        specFile.writeText(
+            """
+            name: spec without workflow
+        """.trimIndent()
+        )
         parseWithFailures("Spec file must have a single 'workflow' property specifying the path to the workflow file relative to the workspace root")
     }
 
     "fails if workflow does not exist in the workflows root" {
-        specFile.writeText("workflow: non_existent.yml")
+        specFile.writeText(
+            """
+            name: spec with non-existing workflow file
+            workflow: non_existent.yml
+        """.trimIndent()
+        )
         parseWithFailures("The workflow file 'non_existent.yml' does not exist in the workflows root directory")
     }
 
     "handles optional parameters" {
-        specFile.writeText("workflow: workflow.yml")
-        parser.parse(specFile) shouldBeEqual actSpec()
+        specFile.writeText(
+            """
+            name: barebone spec
+            workflow: workflow.yml
+        """.trimIndent()
+        )
+        parser.parse(specFile) shouldBeEqual actSpec("barebone spec")
     }
 
     "captures job ID" {
         specFile.writeText(
             """
+            name: spec running a single job
             workflow: workflow.yml
             job: awesome-job
         """.trimIndent()
         )
         parser.parse(specFile) shouldBeEqual actSpec(
+            name = "spec running a single job",
             job = "awesome-job"
         )
     }
@@ -87,12 +108,14 @@ class ActTestSpecParserTest : FreeSpec({
     "handles event type" {
         specFile.writeText(
             """
+            name: spec specifying an event type
             workflow: workflow.yml
             event: 
                 type: pull_request
         """.trimIndent()
         )
         parser.parse(specFile) shouldBeEqual actSpec(
+            name = "spec specifying an event type",
             event = ActTestSpecEvent("pull_request", null)
         )
     }
@@ -103,12 +126,14 @@ class ActTestSpecParserTest : FreeSpec({
         }
         specFile.writeText(
             """
+            name: spec providing an event payload
             workflow: workflow.yml
             event: 
                 payload: event_payload.json
         """.trimIndent()
         )
         parser.parse(specFile) shouldBeEqual actSpec(
+            name = "spec providing an event payload",
             event = ActTestSpecEvent(null, payloadFile.toPath())
         )
     }
@@ -116,6 +141,7 @@ class ActTestSpecParserTest : FreeSpec({
     "requires event payload to be located in the specs root" {
         specFile.writeText(
             """
+            name: spec specifying a non-existing payload file
             workflow: workflow.yml
             event: 
                 payload: non_existent.json
@@ -130,6 +156,7 @@ class ActTestSpecParserTest : FreeSpec({
         }
         specFile.writeText(
             """
+            name: spec specifying both an event type and payload
             workflow: workflow.yml
             event: 
                 type: pull_request
@@ -137,6 +164,7 @@ class ActTestSpecParserTest : FreeSpec({
         """.trimIndent()
         )
         parser.parse(specFile) shouldBeEqual actSpec(
+            name = "spec specifying both an event type and payload",
             event = ActTestSpecEvent("pull_request", payloadFile.toPath())
         )
     }
@@ -150,6 +178,7 @@ class ActTestSpecParserTest : FreeSpec({
     ) { inputType ->
         specFile.writeText(
             """
+                name: spec with inputs
                 workflow: workflow.yml
                 $inputType:
                     values:
@@ -160,10 +189,10 @@ class ActTestSpecParserTest : FreeSpec({
 
         val expectedValues = mapOf("key1" to "value1", "key2" to 4)
         val expectedSpec = when (inputType) {
-            "env" -> actSpec(env = ActTestSpecInput(null, expectedValues))
-            "inputs" -> actSpec(inputs = ActTestSpecInput(null, expectedValues))
-            "secrets" -> actSpec(secrets = ActTestSpecInput(null, expectedValues))
-            "variables" -> actSpec(variables = ActTestSpecInput(null, expectedValues))
+            "env" -> actSpec(name = "spec with inputs", env = ActTestSpecInput(null, expectedValues))
+            "inputs" -> actSpec(name = "spec with inputs", inputs = ActTestSpecInput(null, expectedValues))
+            "secrets" -> actSpec(name = "spec with inputs", secrets = ActTestSpecInput(null, expectedValues))
+            "variables" -> actSpec(name = "spec with inputs", variables = ActTestSpecInput(null, expectedValues))
             else -> throw IllegalArgumentException("Unexpected workflow input type")
         }
         parser.parse(specFile) shouldBeEqual expectedSpec
@@ -181,6 +210,7 @@ class ActTestSpecParserTest : FreeSpec({
         }
         specFile.writeText(
             """
+                name: spec with inputs
                 workflow: workflow.yml
                 $inputType:
                     file: values.json
@@ -188,10 +218,14 @@ class ActTestSpecParserTest : FreeSpec({
         )
 
         val expectedSpec = when (inputType) {
-            "env" -> actSpec(env = ActTestSpecInput(eventFile.toPath(), emptyMap()))
-            "inputs" -> actSpec(inputs = ActTestSpecInput(eventFile.toPath(), emptyMap()))
-            "secrets" -> actSpec(secrets = ActTestSpecInput(eventFile.toPath(), emptyMap()))
-            "variables" -> actSpec(variables = ActTestSpecInput(eventFile.toPath(), emptyMap()))
+            "env" -> actSpec(name = "spec with inputs", env = ActTestSpecInput(eventFile.toPath(), emptyMap()))
+            "inputs" -> actSpec(name = "spec with inputs", inputs = ActTestSpecInput(eventFile.toPath(), emptyMap()))
+            "secrets" -> actSpec(name = "spec with inputs", secrets = ActTestSpecInput(eventFile.toPath(), emptyMap()))
+            "variables" -> actSpec(
+                name = "spec with inputs",
+                variables = ActTestSpecInput(eventFile.toPath(), emptyMap())
+            )
+
             else -> throw IllegalArgumentException("Unexpected workflow input type")
         }
         parser.parse(specFile) shouldBeEqual expectedSpec
@@ -209,6 +243,7 @@ class ActTestSpecParserTest : FreeSpec({
         }
         specFile.writeText(
             """
+                name: spec with inputs
                 workflow: workflow.yml
                 $inputType:
                     file: values.json
@@ -220,10 +255,22 @@ class ActTestSpecParserTest : FreeSpec({
 
         val expectedValues = mapOf("key1" to "value1", "key2" to 4)
         val expectedSpec = when (inputType) {
-            "env" -> actSpec(env = ActTestSpecInput(eventFile.toPath(), expectedValues))
-            "inputs" -> actSpec(inputs = ActTestSpecInput(eventFile.toPath(), expectedValues))
-            "secrets" -> actSpec(secrets = ActTestSpecInput(eventFile.toPath(), expectedValues))
-            "variables" -> actSpec(variables = ActTestSpecInput(eventFile.toPath(), expectedValues))
+            "env" -> actSpec(name = "spec with inputs", env = ActTestSpecInput(eventFile.toPath(), expectedValues))
+            "inputs" -> actSpec(
+                name = "spec with inputs",
+                inputs = ActTestSpecInput(eventFile.toPath(), expectedValues)
+            )
+
+            "secrets" -> actSpec(
+                name = "spec with inputs",
+                secrets = ActTestSpecInput(eventFile.toPath(), expectedValues)
+            )
+
+            "variables" -> actSpec(
+                name = "spec with inputs",
+                variables = ActTestSpecInput(eventFile.toPath(), expectedValues)
+            )
+
             else -> throw IllegalArgumentException("Unexpected workflow input type")
         }
         parser.parse(specFile) shouldBeEqual expectedSpec
@@ -237,14 +284,13 @@ class ActTestSpecParserTest : FreeSpec({
         ) { resourceType ->
             specFile.writeText(
                 """
+                name: spec with inputs
                 workflow: workflow.yml
                 resources:
                     $resourceType:
                         enabled: true
             """.trimIndent()
             )
-
-
             parseWithFailures("The directory for storing ${if (resourceType == "artifactServer") "artifact server" else "cache server"} data must be provided if resource is enabled")
         }
 
@@ -255,6 +301,7 @@ class ActTestSpecParserTest : FreeSpec({
         ) { resourceType ->
             specFile.writeText(
                 """
+                name: spec with inputs
                 workflow: workflow.yml
                 resources:
                     $resourceType:
@@ -267,6 +314,7 @@ class ActTestSpecParserTest : FreeSpec({
 
             val expectedSpec = when (resourceType) {
                 "artifactServer" -> actSpec(
+                    name = "spec with inputs",
                     resources = ActTestSpecResources(
                         ActTestSpecResource(
                             true,
@@ -278,6 +326,7 @@ class ActTestSpecParserTest : FreeSpec({
                 )
 
                 "cacheServer" -> actSpec(
+                    name = "spec with inputs",
                     resources = ActTestSpecResources(
                         null,
                         ActTestSpecResource(true, Paths.get("storage/cacheServer"), "192.168.0.54", 34567)
@@ -293,6 +342,7 @@ class ActTestSpecParserTest : FreeSpec({
     "allows specifying additional act params" {
         specFile.writeText(
             """
+            name: spec with additional args
             workflow: workflow.yml
             additionalArgs:
             - --json
@@ -301,23 +351,13 @@ class ActTestSpecParserTest : FreeSpec({
         """.trimIndent()
         )
         parser.parse(specFile) shouldBeEqual actSpec(
+            name = "spec with additional args",
             additionalArgs = listOf(
                 "--json",
                 "--platform",
                 "ubuntu-18.04=nektos/act-environments-ubuntu:18.04"
             )
         )
-    }
-
-    "allows specifying spec description" {
-        specFile.writeText(
-            """
-            workflow: workflow.yml
-            description: |
-                My first ever workflow spec file!
-        """.trimIndent()
-        )
-        parser.parse(specFile) shouldBeEqual actSpec(description = "My first ever workflow spec file!")
     }
 
     "captures all violation errors" {

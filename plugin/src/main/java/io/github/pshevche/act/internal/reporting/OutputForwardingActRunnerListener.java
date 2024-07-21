@@ -4,11 +4,11 @@ import io.github.pshevche.act.internal.ActTestSpecRunnerListener;
 import io.github.pshevche.act.internal.TestDescriptor;
 import org.gradle.api.logging.Logger;
 
-class OutputForwardingActRunnerListener implements ActTestSpecRunnerListener {
+public class OutputForwardingActRunnerListener implements ActTestSpecRunnerListener {
 
     private final Logger logger;
 
-    OutputForwardingActRunnerListener(Logger logger) {
+    public OutputForwardingActRunnerListener(Logger logger) {
         this.logger = logger;
     }
 

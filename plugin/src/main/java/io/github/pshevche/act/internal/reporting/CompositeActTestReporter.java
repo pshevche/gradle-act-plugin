@@ -5,11 +5,11 @@ import io.github.pshevche.act.internal.TestDescriptor.SpecDescriptor;
 
 import java.util.List;
 
-class CompositeActTestReporter extends AbstractActTestReporter {
+public class CompositeActTestReporter extends AbstractActTestReporter {
 
     private final List<ActTestReporter> delegates;
 
-    CompositeActTestReporter(List<ActTestReporter> delegates) {
+    public CompositeActTestReporter(List<ActTestReporter> delegates) {
         this.delegates = delegates;
     }
 

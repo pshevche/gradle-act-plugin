@@ -2,10 +2,10 @@ package io.github.pshevche.act.internal;
 
 import java.util.List;
 
-class CompositeActTestSpecRunnerListener implements ActTestSpecRunnerListener {
+public class CompositeActTestSpecRunnerListener implements ActTestSpecRunnerListener {
     private final List<ActTestSpecRunnerListener> delegates;
 
-    CompositeActTestSpecRunnerListener(List<ActTestSpecRunnerListener> delegates) {
+    public CompositeActTestSpecRunnerListener(List<ActTestSpecRunnerListener> delegates) {
         this.delegates = delegates;
     }
 

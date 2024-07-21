@@ -9,6 +9,8 @@ import java.util.Map;
 public class ActTestSpecYaml {
 
     @Nullable
+    private String name;
+    @Nullable
     private String workflow;
     @Nullable
     private String job;
@@ -28,11 +30,10 @@ public class ActTestSpecYaml {
     private ActTestSpecResourcesYaml resources;
     @Nullable
     private List<String> additionalArgs;
-    @Nullable
-    private String description;
 
     // Default constructor
     public ActTestSpecYaml() {
+        this.name = null;
         this.workflow = null;
         this.job = null;
         this.event = null;
@@ -43,7 +44,15 @@ public class ActTestSpecYaml {
         this.matrix = null;
         this.resources = null;
         this.additionalArgs = null;
-        this.description = null;
+    }
+
+    @Nullable
+    public String getName() {
+        return name;
+    }
+
+    public void setName(@Nullable String name) {
+        this.name = name;
     }
 
     @Nullable
@@ -136,19 +145,11 @@ public class ActTestSpecYaml {
         this.additionalArgs = additionalArgs;
     }
 
-    @Nullable
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(@Nullable String description) {
-        this.description = description;
-    }
-
     @Override
     public String toString() {
         return "ActTestSpecYaml{" +
-                "workflow='" + workflow + '\'' +
+                "name='" + name + '\'' +
+                ", workflow='" + workflow + '\'' +
                 ", job='" + job + '\'' +
                 ", event=" + event +
                 ", env=" + env +
@@ -158,7 +159,6 @@ public class ActTestSpecYaml {
                 ", matrix=" + matrix +
                 ", resources=" + resources +
                 ", additionalArgs=" + additionalArgs +
-                ", description='" + description + '\'' +
                 '}';
     }
 }

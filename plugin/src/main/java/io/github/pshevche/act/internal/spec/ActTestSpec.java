@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public record ActTestSpec(
+        String name,
         Path workflow,
         @Nullable String job,
         @Nullable ActTestSpecEvent event,
@@ -15,7 +16,6 @@ public record ActTestSpec(
         @Nullable ActTestSpecInput variables,
         Map<String, Object> matrix,
         @Nullable ActTestSpecResources resources,
-        List<String> additionalArgs,
-        @Nullable String description
+        List<String> additionalArgs
 ) {
 }

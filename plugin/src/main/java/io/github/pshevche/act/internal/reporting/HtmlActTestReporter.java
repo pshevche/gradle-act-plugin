@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-class HtmlActTestReporter extends AbstractActTestReporter {
+public class HtmlActTestReporter extends AbstractActTestReporter {
 
     private static final Configuration FREEMARKER_CONFIGURATION = createFreemarkerConfiguration();
 
@@ -33,7 +33,7 @@ class HtmlActTestReporter extends AbstractActTestReporter {
     private final Path reportFile;
     private final List<Spec> specs = new ArrayList<>();
 
-    HtmlActTestReporter(Path reportFile) {
+    public HtmlActTestReporter(Path reportFile) {
         this.reportFile = reportFile;
     }
 
