@@ -11,7 +11,7 @@ import java.nio.file.Files
 
 class GradleProject(private val workspaceDir: File) : BeforeTestListener {
 
-    private val buildFile by lazy { workspaceDir.resolve("build.gradle") }
+    val buildFile by lazy { workspaceDir.resolve("build.gradle") }
     val settingsFile by lazy { workspaceDir.resolve("settings.gradle") }
     private val workflowsRoot by lazy { workspaceDir.resolve(".github/workflows") }
     private val specsRoot by lazy { workspaceDir.resolve(".github/act") }

@@ -169,7 +169,7 @@ class ActTestCoreFuncTest : FreeSpec({
     ) { enabled ->
         project.addWorkflow("always_passing_workflow")
         project.addSpec(
-        "passing.act.yml", """
+            "passing.act.yml", """
             name: always passing workflow
             workflow: always_passing_workflow.yml
         """.trimIndent()
@@ -179,5 +179,30 @@ class ActTestCoreFuncTest : FreeSpec({
         val result = project.test(*args.toTypedArray())
 
         result.output.contains("Hello, World!") shouldBe enabled
+    }
+
+    "does not register a task if extension is not configured" {
+        project.buildFile.writeText(
+            """
+            plugins {
+                id('base')
+                id('io.github.pshevche.act')
+            }
+        """.trimIndent()
+        )
+        val result = project.testAndFail()
+        result.output shouldContain "property 'specsRoot' doesn't have a configured value"
+    }
+
+    "missing extension configuration does not break the build" {
+        project.buildFile.writeText(
+            """
+            plugins {
+                id('base')
+                id('io.github.pshevche.act')
+            }
+        """.trimIndent()
+        )
+        project.run("help")
     }
 })
