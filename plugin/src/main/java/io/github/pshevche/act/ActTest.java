@@ -22,7 +22,6 @@ import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.VerificationException;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.util.Comparator;
 import java.util.List;
@@ -36,15 +35,16 @@ public abstract class ActTest extends DefaultTask {
     private static final Pattern SPEC_FILE_EXTENSION = Pattern.compile(".*\\.act\\.(yml|yaml)$");
     private static final Comparator<File> SPEC_FILE_COMPARATOR = Comparator.comparing(File::getAbsolutePath);
 
-    private final DirectoryProperty workflowsRoot;
-    private final DirectoryProperty specsRoot;
-    private final DirectoryProperty reportsDir;
+    private final DirectoryProperty workflowsRoot = directoryProperty();
+    private final DirectoryProperty specsRoot = directoryProperty();
+    private final DirectoryProperty reportsDir = directoryProperty().convention(buildDirectory().dir("reports/act"));
 
-    @Inject
-    public ActTest(DirectoryProperty workflowsRoot, DirectoryProperty specsRoot) {
-        this.workflowsRoot = workflowsRoot;
-        this.specsRoot = specsRoot;
-        this.reportsDir = getProject().getObjects().directoryProperty().convention(getProject().getLayout().getBuildDirectory().dir("reports/act"));
+    private DirectoryProperty directoryProperty() {
+        return getProject().getObjects().directoryProperty();
+    }
+
+    private DirectoryProperty buildDirectory() {
+        return getProject().getLayout().getBuildDirectory();
     }
 
     @InputDirectory
@@ -142,8 +142,8 @@ public abstract class ActTest extends DefaultTask {
     }
 
     private ActTestReporter createActTestReporter() throws Exception {
-        var xmlReportFile = reportsDir.file("test.xml").get().getAsFile().toPath();
-        var htmlReportFile = reportsDir.file("test.html").get().getAsFile().toPath();
+        var xmlReportFile = reportsDir.file(getName() + ".xml").get().getAsFile().toPath();
+        var htmlReportFile = reportsDir.file(getName() + ".html").get().getAsFile().toPath();
         return new CompositeActTestReporter(List.of(
                 new XmlActTestReporter(xmlReportFile),
                 new HtmlActTestReporter(htmlReportFile)

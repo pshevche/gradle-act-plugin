@@ -13,8 +13,8 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
 
     val buildFile by lazy { workspaceDir.resolve("build.gradle") }
     val settingsFile by lazy { workspaceDir.resolve("settings.gradle") }
-    private val workflowsRoot by lazy { workspaceDir.resolve(".github/workflows") }
-    private val specsRoot by lazy { workspaceDir.resolve(".github/act") }
+    val workflowsRoot by lazy { workspaceDir.resolve(".github/workflows") }
+    val specsRoot by lazy { workspaceDir.resolve(".github/act") }
 
     override suspend fun beforeTest(testCase: TestCase) {
         cleanWorkspace()
@@ -39,27 +39,29 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
         )
     }
 
-    fun addWorkflow(workflowName: String, targetLocation: String = "$workflowName.yml") {
-        val workflowFile = workflowsRoot.resolve(targetLocation)
-        Files.createDirectories(workflowFile.toPath().parent)
-        copyWorkflowContent(workflowFile, workflowName)
+    fun addWorkflow(workflowName: String, targetLocation: File = workflowsRoot.resolve("${workflowName}.yml")) {
+        Files.createDirectories(targetLocation.toPath().parent)
+        copyWorkflowContent(targetLocation, workflowName)
     }
 
     fun addSpec(filePath: String, content: String) {
-        val specFile = specsRoot.resolve(filePath)
+        addSpec(specsRoot.resolve(filePath), content)
+    }
+
+    fun addSpec(specFile: File, content: String) {
         Files.createDirectories(specFile.toPath().parent)
         specFile.writeText(content)
     }
 
     fun run(vararg args: String) = runner(*args).build()
 
+    fun runAndFail(vararg args: String) = runner(*args).buildAndFail()
+
     fun test(vararg args: String): BuildResult = run("actTest", *args)
 
-    fun testAndFail(vararg args: String): BuildResult = runner("actTest", *args).buildAndFail()
+    fun testAndFail(vararg args: String): BuildResult = runAndFail("actTest", *args)
 
-    fun xmlReport() = file("build/reports/act/test.xml")
-
-    fun htmlReport() = file("build/reports/act/test.html")
+    fun xmlReport(taskName: String = "actTest") = file("build/reports/act/${taskName}.xml")
 
     private fun copyWorkflowContent(workflowFile: File, workflowName: String) {
         val workflowContent = this.javaClass.getResourceAsStream("/workflows/$workflowName.yml")!!

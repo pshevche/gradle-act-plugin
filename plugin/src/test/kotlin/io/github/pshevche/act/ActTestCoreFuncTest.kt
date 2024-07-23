@@ -109,7 +109,10 @@ class ActTestCoreFuncTest : FreeSpec({
 
     "discovers specs and workflow in nested directories" {
         project.addWorkflow("always_passing_workflow")
-        project.addWorkflow("always_failing_workflow", "nested/always_failing_workflow.yml")
+        project.addWorkflow(
+            "always_failing_workflow",
+            project.workflowsRoot.resolve("nested/always_failing_workflow.yml")
+        )
         project.addSpec(
             "passing.act.yml", """
             name: always passing workflow
@@ -204,5 +207,65 @@ class ActTestCoreFuncTest : FreeSpec({
         """.trimIndent()
         )
         project.run("help")
+    }
+
+    "supports defining custom test tasks" {
+        val customSuccessfulWorkflowsRoot = tempdir("successfulWorkflows")
+        val customSuccessfulSpecsRoot = tempdir("successfulSpecs")
+        val customFailingWorkflowsRoot = tempdir("failingWorkflows")
+        val customFailingSpecsRoot = tempdir("failingSpecs")
+
+        project.buildFile.writeText(
+            """
+            plugins {
+                id('base')
+                id('io.github.pshevche.act')
+            }
+            
+            tasks.register('customSuccessfulActTest', io.github.pshevche.act.ActTest) {
+                workflowsRoot = file('${customSuccessfulWorkflowsRoot.absolutePath}')
+                specsRoot = file('${customSuccessfulSpecsRoot.absolutePath}')
+            }
+            
+            tasks.register('customFailingActTest', io.github.pshevche.act.ActTest) {
+                workflowsRoot = file('${customFailingWorkflowsRoot.absolutePath}')
+                specsRoot = file('${customFailingSpecsRoot.absolutePath}')
+            }
+        """.trimIndent()
+        )
+
+        project.addWorkflow(
+            "always_passing_workflow",
+            customSuccessfulWorkflowsRoot.resolve("always_passing_workflow.yaml")
+        )
+        project.addSpec(
+            customSuccessfulSpecsRoot.resolve("custom.act.yaml"), """
+            name: successful spec in custom root
+            workflow: always_passing_workflow.yaml
+        """.trimIndent()
+        )
+        project.addWorkflow(
+            "always_failing_workflow",
+            customFailingWorkflowsRoot.resolve("always_failing_workflow.yaml")
+        )
+        project.addSpec(
+            customFailingSpecsRoot.resolve("custom.act.yaml"), """
+            name: failing spec in custom root
+            workflow: always_failing_workflow.yaml
+        """.trimIndent()
+        )
+
+        project.runAndFail("customSuccessfulActTest", "customFailingActTest")
+
+        assertEvents(project.xmlReport("customSuccessfulActTest")) {
+            spec(name = "successful spec in custom root", result = SUCCESSFUL) {
+                job(name = "successful_job", result = SUCCESSFUL)
+            }
+        }
+        assertEvents(project.xmlReport("customFailingActTest")) {
+            spec(name = "failing spec in custom root", result = FAILED) {
+                job(name = "failing_job", result = FAILED)
+            }
+        }
     }
 })
