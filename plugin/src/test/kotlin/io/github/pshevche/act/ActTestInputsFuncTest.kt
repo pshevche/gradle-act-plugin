@@ -7,23 +7,23 @@ import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.string.shouldContain
 import org.opentest4j.reporting.events.core.Result.Status.SUCCESSFUL
 
-class ActTestEnvFuncTest : FreeSpec({
+class ActTestInputsFuncTest : FreeSpec({
 
     val project = extension(GradleProject(tempdir()))
 
     beforeTest {
-        project.addWorkflow("print_env_variables")
+        project.addWorkflow("print_inputs")
     }
 
-    "supports setting environment variable values directly" {
+    "supports setting workflow input values directly" {
         project.addSpec(
-            "env_values.act.yml", """
-            name: env values
-            workflow: print_env_variables.yml
-            env:
+            "input_values.act.yml", """
+            name: input values
+            workflow: print_inputs.yml
+            inputs:
                 values:
-                    GREETING: Hello
-                    NAME: Bruce
+                    greeting: Hello
+                    name: Bruce
         """.trimIndent()
         )
 
@@ -31,20 +31,20 @@ class ActTestEnvFuncTest : FreeSpec({
 
         result.output shouldContain "Hello, Bruce!"
         assertEvents(project.xmlReport()) {
-            spec(name = "env values", result = SUCCESSFUL) {
+            spec(name = "input values", result = SUCCESSFUL) {
                 job(name = "print_greeting", result = SUCCESSFUL)
             }
         }
     }
 
-    "supports setting environment variables from file" {
-        project.addSpecResource("inputs/example_env.env")
+    "supports setting workflow inputs from file" {
+        project.addSpecResource("inputs/example_inputs.input")
         project.addSpec(
-            "env_file.act.yml", """
-            name: env file
-            workflow: print_env_variables.yml
-            env:
-                file: inputs/example_env.env
+            "inputs_file.act.yml", """
+            name: inputs file
+            workflow: print_inputs.yml
+            inputs:
+                file: inputs/example_inputs.input
         """.trimIndent()
         )
 
@@ -52,7 +52,7 @@ class ActTestEnvFuncTest : FreeSpec({
 
         result.output shouldContain "Hallo, Falco!"
         assertEvents(project.xmlReport()) {
-            spec(name = "env file", result = SUCCESSFUL) {
+            spec(name = "inputs file", result = SUCCESSFUL) {
                 job(name = "print_greeting", result = SUCCESSFUL)
             }
         }
