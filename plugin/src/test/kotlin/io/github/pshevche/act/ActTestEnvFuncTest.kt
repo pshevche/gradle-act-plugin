@@ -38,13 +38,13 @@ class ActTestEnvFuncTest : FreeSpec({
     }
 
     "supports setting environment variables from file" {
-        project.addSpecResource("inputs/example_env.env")
+        project.addSpecResource("inputs/greeting.env")
         project.addSpec(
             "env_file.act.yml", """
             name: env file
             workflow: print_env_variables.yml
             env:
-                file: inputs/example_env.env
+                file: inputs/greeting.env
         """.trimIndent()
         )
 
