@@ -115,10 +115,17 @@ public class ActTestSpecRunner {
 
     private static void addEvent(List<String> cmd, @Nullable ActTestSpecEvent event) {
         Optional.ofNullable(event)
-                .ifPresent(it -> {
-                    Optional.ofNullable(it.type()).ifPresent(cmd::add);
-                    addIfPresent(cmd, it.payload(), "eventpath");
-                });
+                .ifPresentOrElse(
+                        it -> {
+                            Optional.ofNullable(it.type())
+                                    .ifPresentOrElse(
+                                            cmd::add,
+                                            () -> cmd.add("--detect-event")
+                                    );
+                            addIfPresent(cmd, it.payload(), "eventpath");
+                        },
+                        () -> cmd.add("--detect-event")
+                );
     }
 
     private static void addIfPresent(List<String> cmd, @Nullable Object value, String paramName) {

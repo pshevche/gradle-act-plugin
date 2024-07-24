@@ -44,8 +44,13 @@ public class CompositeActTestReporter extends AbstractActTestReporter {
     }
 
     @Override
-    public void reportJobFinishedSuccessfully(JobDescriptor job, String output) {
-        delegates.forEach(d -> d.reportJobFinishedSuccessfully(job, output));
+    public void reportSuccessfulJobStep(JobDescriptor job) {
+        delegates.forEach(d -> d.reportSuccessfulJobStep(job));
+    }
+
+    @Override
+    public void reportJobFinishedOrSkipped(JobDescriptor job, String output) {
+        delegates.forEach(d -> d.reportJobFinishedOrSkipped(job, output));
     }
 
     @Override

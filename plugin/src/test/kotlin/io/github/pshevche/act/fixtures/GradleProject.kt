@@ -44,6 +44,12 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
         copyWorkflowContent(targetLocation, workflowName)
     }
 
+    fun addSpecResource(resourceName: String) {
+        val resourceFile = specsRoot.resolve(resourceName)
+        Files.createDirectories(resourceFile.toPath().parent)
+        copyResourceContent(resourceFile, resourceName)
+    }
+
     fun addSpec(filePath: String, content: String) {
         addSpec(specsRoot.resolve(filePath), content)
     }
@@ -61,16 +67,20 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
 
     fun testAndFail(vararg args: String): BuildResult = runAndFail("actTest", *args)
 
-    fun xmlReport(taskName: String = "actTest") = file("build/reports/act/${taskName}.xml")
+    fun xmlReport(taskName: String = "actTest") = file("build/reports/act/${taskName}/test.xml")
 
     private fun copyWorkflowContent(workflowFile: File, workflowName: String) {
-        val workflowContent = this.javaClass.getResourceAsStream("/workflows/$workflowName.yml")!!
+        copyResourceContent(workflowFile, "workflows/${workflowName}.yml")
+    }
+
+    private fun copyResourceContent(targetFile: File, resourcePath: String) {
+        val resourceContent = this.javaClass.getResourceAsStream("/${resourcePath}")!!
             .bufferedReader().use { reader ->
                 reader.readText()
             }
 
-        workflowFile.bufferedWriter().use { writer ->
-            writer.write(workflowContent)
+        targetFile.bufferedWriter().use { writer ->
+            writer.write(resourceContent)
         }
     }
 

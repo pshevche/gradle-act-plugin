@@ -37,7 +37,7 @@ public abstract class ActTest extends DefaultTask {
 
     private final DirectoryProperty workflowsRoot = directoryProperty();
     private final DirectoryProperty specsRoot = directoryProperty();
-    private final DirectoryProperty reportsDir = directoryProperty().convention(buildDirectory().dir("reports/act"));
+    private final DirectoryProperty reportsDir = directoryProperty().convention(buildDirectory().dir("reports/act/" + getName()));
 
     private DirectoryProperty directoryProperty() {
         return getProject().getObjects().directoryProperty();
@@ -142,8 +142,8 @@ public abstract class ActTest extends DefaultTask {
     }
 
     private ActTestReporter createActTestReporter() throws Exception {
-        var xmlReportFile = reportsDir.file(getName() + ".xml").get().getAsFile().toPath();
-        var htmlReportFile = reportsDir.file(getName() + ".html").get().getAsFile().toPath();
+        var xmlReportFile = reportsDir.file("test.xml").get().getAsFile().toPath();
+        var htmlReportFile = reportsDir.file("test.html").get().getAsFile().toPath();
         return new CompositeActTestReporter(List.of(
                 new XmlActTestReporter(xmlReportFile),
                 new HtmlActTestReporter(htmlReportFile)

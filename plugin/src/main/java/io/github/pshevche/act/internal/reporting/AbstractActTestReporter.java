@@ -35,7 +35,12 @@ abstract class AbstractActTestReporter implements ActTestReporter {
     }
 
     @Override
-    public void reportJobFinishedSuccessfully(TestDescriptor.JobDescriptor job, String output) {
+    public void reportSuccessfulJobStep(TestDescriptor.JobDescriptor job) {
+
+    }
+
+    @Override
+    public void reportJobFinishedOrSkipped(TestDescriptor.JobDescriptor job, String output) {
 
     }
 

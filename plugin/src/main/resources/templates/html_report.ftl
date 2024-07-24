@@ -22,6 +22,9 @@
         .failed {
           color: red;
         }
+        .skipped {
+          color: grey;
+        }
         .arrow {
           float: right;
           transition: transform 0.3s;
@@ -40,7 +43,7 @@
 
 <div class="container mt-5">
     <h1>Act Test Summary</h1>
-    <p class="lead">${execution.jobsCount} jobs run in ${execution.specsCount} specs with ${execution.failingJobsCount} failure</p>
+    <p class="lead">${execution.jobsCount} <#if execution.jobsCount == 1>job<#else>jobs</#if> run in ${execution.specsCount} <#if execution.specsCount == 1>spec<#else>specs</#if> with ${execution.failingJobsCount} <#if execution.failingJobsCount == 1>failure<#else>failures</#if></p>
 
     <div id="specsAccordion" class="accordion">
         <#list specs as spec>

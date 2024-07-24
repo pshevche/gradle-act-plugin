@@ -11,8 +11,11 @@ import org.opentest4j.reporting.schema.Namespace;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.opentest4j.reporting.events.core.Result.Status.FAILED;
+import static org.opentest4j.reporting.events.core.Result.Status.SKIPPED;
 import static org.opentest4j.reporting.events.core.Result.Status.SUCCESSFUL;
 import static org.opentest4j.reporting.events.root.RootFactory.finished;
 import static org.opentest4j.reporting.events.root.RootFactory.started;
@@ -21,6 +24,7 @@ public class XmlActTestReporter extends AbstractActTestReporter {
 
     private final DocumentWriter<Events> writer;
     private final ActTestIdStore idStore = new ActTestIdStore();
+    private final Set<TestDescriptor.JobDescriptor> jobsWithSuccessfulSteps = new HashSet<>();
 
     public XmlActTestReporter(Path reportFile) throws Exception {
         if (!reportFile.toFile().exists()) {
@@ -62,8 +66,13 @@ public class XmlActTestReporter extends AbstractActTestReporter {
     }
 
     @Override
-    public void reportJobFinishedSuccessfully(TestDescriptor.JobDescriptor job, String output) {
-        reportJobFinished(job, SUCCESSFUL, output);
+    public void reportSuccessfulJobStep(TestDescriptor.JobDescriptor job) {
+        jobsWithSuccessfulSteps.add(job);
+    }
+
+    @Override
+    public void reportJobFinishedOrSkipped(TestDescriptor.JobDescriptor job, String output) {
+        reportJobFinished(job, jobsWithSuccessfulSteps.contains(job) ? SUCCESSFUL : SKIPPED, output);
     }
 
     @Override

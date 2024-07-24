@@ -16,7 +16,9 @@ public interface ActTestReporter extends AutoCloseable {
 
     void reportJobStarted(TestDescriptor.JobDescriptor job);
 
-    void reportJobFinishedSuccessfully(TestDescriptor.JobDescriptor job, String output);
+    void reportSuccessfulJobStep(TestDescriptor.JobDescriptor job);
+
+    void reportJobFinishedOrSkipped(TestDescriptor.JobDescriptor job, String output);
 
     void reportJobFinishedWithFailure(TestDescriptor.JobDescriptor job, String output);
 }

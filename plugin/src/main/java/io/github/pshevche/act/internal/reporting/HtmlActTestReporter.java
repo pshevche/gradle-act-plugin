@@ -15,7 +15,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class HtmlActTestReporter extends AbstractActTestReporter {
 
@@ -32,6 +34,7 @@ public class HtmlActTestReporter extends AbstractActTestReporter {
 
     private final Path reportFile;
     private final List<Spec> specs = new ArrayList<>();
+    private final Set<TestDescriptor.JobDescriptor> jobsWithSuccessfulSteps = new HashSet<>();
 
     public HtmlActTestReporter(Path reportFile) {
         this.reportFile = reportFile;
@@ -71,13 +74,23 @@ public class HtmlActTestReporter extends AbstractActTestReporter {
     }
 
     @Override
-    public void reportJobFinishedSuccessfully(TestDescriptor.JobDescriptor job, String output) {
-        lastSpec().addJob(job.name(), Status.SUCCESSFUL.name().toLowerCase(), output);
+    public void reportSuccessfulJobStep(TestDescriptor.JobDescriptor job) {
+        jobsWithSuccessfulSteps.add(job);
+    }
+
+    @Override
+    public void reportJobFinishedOrSkipped(TestDescriptor.JobDescriptor job, String output) {
+        var status = jobsWithSuccessfulSteps.contains(job) ? Status.SUCCESSFUL : Status.SKIPPED;
+        lastSpec().addJob(job.name(), status.name().toLowerCase(), sanitizeOutputForHTML(output));
     }
 
     @Override
     public void reportJobFinishedWithFailure(TestDescriptor.JobDescriptor job, String output) {
-        lastSpec().addJob(job.name(), Status.FAILED.name().toLowerCase(), output);
+        lastSpec().addJob(job.name(), Status.FAILED.name().toLowerCase(), sanitizeOutputForHTML(output));
+    }
+
+    private String sanitizeOutputForHTML(String output) {
+        return output.replaceAll(System.lineSeparator(), "<br/>");
     }
 
     private Spec lastSpec() {
@@ -89,6 +102,8 @@ public class HtmlActTestReporter extends AbstractActTestReporter {
         // do nothing
     }
 
+    // getters are required by freemarker to populate the template
+    @SuppressWarnings("unused")
     public static final class ExecutionSummary {
         private final int specsCount;
         private final long jobsCount;
@@ -117,6 +132,8 @@ public class HtmlActTestReporter extends AbstractActTestReporter {
         }
     }
 
+    // getters are required by freemarker to populate the template
+    @SuppressWarnings("unused")
     public static class Spec {
         private final String name;
         private final List<Job> jobs = new ArrayList<>();
@@ -145,6 +162,8 @@ public class HtmlActTestReporter extends AbstractActTestReporter {
         }
     }
 
+    // getters are required by freemarker to populate the template
+    @SuppressWarnings("unused")
     public static final class Job {
         private final String name;
         private final String status;

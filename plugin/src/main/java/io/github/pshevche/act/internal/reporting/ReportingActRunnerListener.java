@@ -37,8 +37,10 @@ public class ReportingActRunnerListener implements ActTestSpecRunnerListener {
                     .append(line)
                     .append(System.lineSeparator());
 
-            if (line.endsWith("Job succeeded")) {
-                reporter.reportJobFinishedSuccessfully(jobDescriptor, outputByJob.get(jobDescriptor).toString());
+            if (line.contains("Success - Main")) {
+                reporter.reportSuccessfulJobStep(jobDescriptor);
+            } else if (line.endsWith("Job succeeded")) {
+                reporter.reportJobFinishedOrSkipped(jobDescriptor, outputByJob.get(jobDescriptor).toString());
             } else if (line.endsWith("Job failed")) {
                 reporter.reportJobFinishedWithFailure(jobDescriptor, outputByJob.get(jobDescriptor).toString());
             }

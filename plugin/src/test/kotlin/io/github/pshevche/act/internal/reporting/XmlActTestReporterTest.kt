@@ -6,6 +6,7 @@ import io.github.pshevche.act.internal.TestDescriptor.SpecDescriptor
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.engine.spec.tempfile
 import org.opentest4j.reporting.events.core.Result.Status.FAILED
+import org.opentest4j.reporting.events.core.Result.Status.SKIPPED
 import org.opentest4j.reporting.events.core.Result.Status.SUCCESSFUL
 import java.io.File
 
@@ -43,19 +44,20 @@ class XmlActTestReporterTest : FreeSpec({
             reportTestExecutionStarted()
             reportSpecStarted(spec1)
             reportJobStarted(job1)
-            reportJobFinishedSuccessfully(job1, "job1 output")
+            reportJobFinishedOrSkipped(job1, "job1 output")
             reportSpecFinishedSuccessfully(spec1)
 
             reportSpecStarted(spec2)
             reportJobStarted(job2)
-            reportJobFinishedSuccessfully(job2, "job2 output")
+            reportSuccessfulJobStep(job2)
+            reportJobFinishedOrSkipped(job2, "job2 output")
             reportSpecFinishedSuccessfully(spec2)
             reportTestExecutionFinished()
         }
 
         assertEventsPayload(report) {
             spec(1, "spec1", SUCCESSFUL) {
-                job(2, "job1", SUCCESSFUL, "job1 output")
+                job(2, "job1", SKIPPED, "job1 output")
             }
             spec(3, "spec2", SUCCESSFUL) {
                 job(4, "job2", SUCCESSFUL, "job2 output")
