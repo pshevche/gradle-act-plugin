@@ -1,5 +1,5 @@
 plugins {
-    id("com.gradle.develocity") version "3.17.5"
+    id("com.gradle.develocity") version "3.17.6"
 }
 
 rootProject.name = "gradle-act-plugin"
@@ -11,7 +11,7 @@ develocity {
         termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
         termsOfUseAgree = "yes"
         publishing.onlyIf {
-            false
+            it.buildResult.failures.isNotEmpty()
         }
     }
 }
