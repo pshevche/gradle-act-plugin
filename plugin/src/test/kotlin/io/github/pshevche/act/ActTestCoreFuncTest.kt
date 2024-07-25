@@ -184,6 +184,31 @@ class ActTestCoreFuncTest : FreeSpec({
         result.output.contains("Hello, World!") shouldBe enabled
     }
 
+    withData(
+        nameFn = { "output forwarding can be enabled via task configuration ($it)" },
+        false,
+        true
+    ) { enabled ->
+        project.addWorkflow("always_passing_workflow")
+        project.addSpec(
+            "passing.act.yml", """
+            name: always passing workflow
+            workflow: always_passing_workflow.yml
+        """.trimIndent()
+        )
+        project.buildFile.appendText(
+            """
+            tasks.actTest {
+                forwardActOutput = $enabled
+            }
+        """.trimIndent()
+        )
+
+        val result = project.test()
+
+        result.output.contains("Hello, World!") shouldBe enabled
+    }
+
     "does not register a task if extension is not configured" {
         project.buildFile.writeText(
             """
@@ -278,14 +303,37 @@ class ActTestCoreFuncTest : FreeSpec({
             """.trimIndent()
         )
 
-        project.buildFile.appendText("""
+        project.buildFile.appendText(
+            """
             tasks.actTest {
                 timeout = java.time.Duration.ofMillis(10)
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
 
         val result = project.testAndFail()
 
         result.output shouldContain "Timeout has been exceeded"
+    }
+
+    /**
+     * Only works if run via Gradle, not via Kotest IntelliJ plugin.
+     */
+    "works with configuration cache" {
+        project.addWorkflow("always_passing_workflow")
+        project.addSpec(
+            "always_passing.act.yml", """
+                name: always passing workflow
+                workflow: always_passing_workflow.yml
+            """.trimIndent()
+        )
+
+        project.test("--configuration-cache")
+
+        assertEvents(project.xmlReport()) {
+            spec(name = "always passing workflow", result = SUCCESSFUL) {
+                job(name = "successful_job", result = SUCCESSFUL)
+            }
+        }
     }
 })

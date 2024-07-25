@@ -14,8 +14,10 @@ import io.github.pshevche.act.internal.reporting.XmlActTestReporter;
 import io.github.pshevche.act.internal.spec.ActTestSpecParser;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
@@ -37,6 +39,12 @@ public abstract class ActTest extends DefaultTask {
 
     private final DirectoryProperty workflowsRoot = directoryProperty();
     private final DirectoryProperty specsRoot = directoryProperty();
+    private final Property<Boolean> forwardActOutput = booleanProperty().convention(Boolean.getBoolean(FORWARD_ACT_OUTPUT_SYS_PROP));
+
+    private Property<Boolean> booleanProperty() {
+        return getProject().getObjects().property(Boolean.class);
+    }
+
     private final DirectoryProperty reportsDir = directoryProperty().convention(buildDirectory().dir("reports/act/" + getName()));
 
     private DirectoryProperty directoryProperty() {
@@ -57,6 +65,11 @@ public abstract class ActTest extends DefaultTask {
     @PathSensitive(PathSensitivity.RELATIVE)
     public DirectoryProperty getSpecsRoot() {
         return specsRoot;
+    }
+
+    @Internal
+    public Property<Boolean> getForwardActOutput() {
+        return forwardActOutput;
     }
 
     @OutputDirectory
@@ -104,7 +117,7 @@ public abstract class ActTest extends DefaultTask {
     }
 
     private ActTestSpecRunnerListener createRunnerListener(ActTestReporter reporter) {
-        if (isOutputForwardingEnabled()) {
+        if (forwardActOutput.get()) {
             return new CompositeActTestSpecRunnerListener(List.of(
                     new OutputForwardingActRunnerListener(getLogger()),
                     new ReportingActRunnerListener(reporter)
@@ -112,12 +125,6 @@ public abstract class ActTest extends DefaultTask {
         } else {
             return new ReportingActRunnerListener(reporter);
         }
-    }
-
-    private boolean isOutputForwardingEnabled() {
-        return getProject().getProviders().systemProperty(FORWARD_ACT_OUTPUT_SYS_PROP)
-                .map(Boolean::parseBoolean)
-                .getOrElse(false);
     }
 
     private List<File> findSpecFiles() {
