@@ -48,8 +48,8 @@ public class ActTestSpecRunner {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return executeSpecWithListenerNotification(spec).waitFor() == 0
-                        ? ActExecResult.PASSED
-                        : ActExecResult.FAILED;
+                    ? ActExecResult.PASSED
+                    : ActExecResult.FAILED;
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } catch (IOException e) {
@@ -62,8 +62,8 @@ public class ActTestSpecRunner {
     private Process executeSpecWithListenerNotification(ActTestSpec spec) throws IOException {
         var specDescriptor = new TestDescriptor.SpecDescriptor(spec.name());
         var process = new ProcessBuilder()
-                .command(cmd(spec))
-                .start();
+            .command(cmd(spec))
+            .start();
 
         notifyListenersOnOutput(process.getInputStream(), it -> listener.onOutput(specDescriptor, it));
         notifyListenersOnOutput(process.getErrorStream(), it -> listener.onError(specDescriptor, it));
@@ -101,20 +101,20 @@ public class ActTestSpecRunner {
 
     private static void addResources(List<String> cmd, @Nullable ActTestSpecResources resources) {
         Optional.ofNullable(resources)
-                .ifPresent(rs -> {
-                    addResource(cmd, rs.artifactServer(), "artifact-server-path", "artifact-server-addr", "artifact-server-port");
-                    addResource(cmd, rs.cacheServer(), "cache-server-path", "cache-server-addr", "cache-server-port");
-                });
+            .ifPresent(rs -> {
+                addResource(cmd, rs.artifactServer(), "artifact-server-path", "artifact-server-addr", "artifact-server-port");
+                addResource(cmd, rs.cacheServer(), "cache-server-path", "cache-server-addr", "cache-server-port");
+            });
     }
 
     private static void addResource(List<String> cmd, @Nullable ActTestSpecResource resource, String storageParam, String addressParam, String portParam) {
         Optional.ofNullable(resource)
-                .filter(ActTestSpecResource::enabled)
-                .ifPresent(r -> {
-                    addIfPresent(cmd, r.storage(), storageParam);
-                    addIfPresent(cmd, r.host(), addressParam);
-                    addIfPresent(cmd, r.port(), portParam);
-                });
+            .filter(ActTestSpecResource::enabled)
+            .ifPresent(r -> {
+                addIfPresent(cmd, r.storage(), storageParam);
+                addIfPresent(cmd, r.host(), addressParam);
+                addIfPresent(cmd, r.port(), portParam);
+            });
     }
 
     private static void addMatrix(List<String> cmd, Map<String, Object> matrix) {
@@ -123,32 +123,32 @@ public class ActTestSpecRunner {
 
     private static void addInputs(ArrayList<String> cmd, @Nullable ActTestSpecInput inputs, String fileParamName, String valueParamName) {
         Optional.ofNullable(inputs)
-                .ifPresent(i -> {
-                    addIfPresent(cmd, i.file(), fileParamName);
-                    i.values().forEach((k, v) -> addIfPresent(cmd, "%s=%s".formatted(k, v), valueParamName));
-                });
+            .ifPresent(i -> {
+                addIfPresent(cmd, i.file(), fileParamName);
+                i.values().forEach((k, v) -> addIfPresent(cmd, "%s=%s".formatted(k, v), valueParamName));
+            });
     }
 
     private static void addEvent(List<String> cmd, @Nullable ActTestSpecEvent event) {
         Optional.ofNullable(event)
-                .ifPresentOrElse(
-                        it -> {
-                            Optional.ofNullable(it.type())
-                                    .ifPresentOrElse(
-                                            cmd::add,
-                                            () -> cmd.add("--detect-event")
-                                    );
-                            addIfPresent(cmd, it.payload(), "eventpath");
-                        },
-                        () -> cmd.add("--detect-event")
-                );
+            .ifPresentOrElse(
+                it -> {
+                    Optional.ofNullable(it.type())
+                        .ifPresentOrElse(
+                            cmd::add,
+                            () -> cmd.add("--detect-event")
+                        );
+                    addIfPresent(cmd, it.payload(), "eventpath");
+                },
+                () -> cmd.add("--detect-event")
+            );
     }
 
     private static void addIfPresent(List<String> cmd, @Nullable Object value, String paramName) {
         Optional.ofNullable(value)
-                .ifPresent(v -> {
-                    cmd.add("--" + paramName);
-                    cmd.add(v.toString());
-                });
+            .ifPresent(v -> {
+                cmd.add("--" + paramName);
+                cmd.add(v.toString());
+            });
     }
 }

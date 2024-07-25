@@ -56,10 +56,10 @@ public final class ActTestSpecResourceYaml {
     @Override
     public String toString() {
         return "ActTestSpecResourceYaml[" +
-                "enabled=" + enabled + ", " +
-                "storage=" + storage + ", " +
-                "host=" + host + ", " +
-                "port=" + port + ']';
+            "enabled=" + enabled + ", " +
+            "storage=" + storage + ", " +
+            "host=" + host + ", " +
+            "port=" + port + ']';
     }
 
 }

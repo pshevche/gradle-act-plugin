@@ -44,11 +44,13 @@ class ActTestCacheServerResourceFuncTest : FreeSpec({
     "supports advanced cache configuration" {
         val cacheServerStorage = project.buildFile.toPath().parent.resolve("cache")
         // custom configuration is invalid and can sometimes cause act to hang
-        project.buildFile.appendText("""
+        project.buildFile.appendText(
+            """
             tasks.actTest {
                 timeout = java.time.Duration.ofSeconds(10)
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         project.addSpec(
             "configured_cache_server.act.yml", """
             name: configured cache server

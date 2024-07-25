@@ -1,4 +1,5 @@
 plugins {
+    checkstyle
     idea
     `java-gradle-plugin`
     alias(libs.plugins.kotlin)
@@ -26,12 +27,12 @@ java {
     }
 }
 
-tasks.test {
-    useJUnitPlatform()
+checkstyle {
+    maxWarnings = 3
 }
 
-tasks.register("example") {
-    inputs.files(tasks.test.get().outputs)
+tasks.test {
+    useJUnitPlatform()
 }
 
 gradlePlugin {

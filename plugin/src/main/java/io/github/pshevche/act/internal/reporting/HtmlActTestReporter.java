@@ -43,12 +43,12 @@ public class HtmlActTestReporter extends AbstractActTestReporter {
     @Override
     public void reportTestExecutionFinished() {
         var templateInputs = Maps.of(
-                "execution", new ExecutionSummary(
-                        specs.size(),
-                        specs.stream().mapToLong(it -> it.jobs.size()).sum(),
-                        specs.stream().flatMap(it -> it.jobs.stream()).filter(it -> "failed".equals(it.status)).count()
-                ),
-                "specs", specs
+            "execution", new ExecutionSummary(
+                specs.size(),
+                specs.stream().mapToLong(it -> it.jobs.size()).sum(),
+                specs.stream().flatMap(it -> it.jobs.stream()).filter(it -> "failed".equals(it.status)).count()
+            ),
+            "specs", specs
         );
         try (var writer = new FileWriter(reportFile.toFile())) {
             var template = FREEMARKER_CONFIGURATION.getTemplate("html_report.ftl");
@@ -110,9 +110,9 @@ public class HtmlActTestReporter extends AbstractActTestReporter {
         private final long failingJobsCount;
 
         ExecutionSummary(
-                int specsCount,
-                long jobsCount,
-                long failingJobsCount
+            int specsCount,
+            long jobsCount,
+            long failingJobsCount
         ) {
             this.specsCount = specsCount;
             this.jobsCount = jobsCount;

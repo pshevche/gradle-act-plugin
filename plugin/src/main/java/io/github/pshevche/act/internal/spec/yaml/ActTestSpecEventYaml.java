@@ -35,8 +35,8 @@ public final class ActTestSpecEventYaml {
     @Override
     public String toString() {
         return "ActTestSpecEventYaml[" +
-                "type=" + type + ", " +
-                "payload=" + payload + ']';
+            "type=" + type + ", " +
+            "payload=" + payload + ']';
     }
 
 }

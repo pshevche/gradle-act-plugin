@@ -6,8 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        greeting: [Hello, Hallo]
-        name: [Bruce, Falco]
+        greeting: [ Hello, Hallo ]
+        name: [ Bruce, Falco ]
     steps:
       - name: Print greeting from variables
         run: echo "${{ matrix.greeting }}, ${{ matrix.name }}!"
