@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.pshevche.act;
 
 import io.github.pshevche.act.internal.ActException;
@@ -82,8 +98,8 @@ public abstract class ActTest extends DefaultTask {
         var specs = findSpecFiles();
         if (specs.isEmpty()) {
             getLogger().warn(
-                    "Act plugin has not detected any specs to execute in '{}'. Make sure your specs are defined in files ending with *.act.yml or *.act.yaml",
-                    specsRoot.get().getAsFile().getAbsolutePath()
+                "Act plugin has not detected any specs to execute in '{}'. Make sure your specs are defined in files ending with *.act.yml or *.act.yaml",
+                specsRoot.get().getAsFile().getAbsolutePath()
             );
             return;
         }
@@ -96,19 +112,19 @@ public abstract class ActTest extends DefaultTask {
 
             reporter.reportTestExecutionStarted();
             specs.stream()
-                    .map(specParser::parse)
-                    .forEach(spec -> {
-                        var specDescriptor = new SpecDescriptor(spec.name());
-                        reporter.reportSpecStarted(specDescriptor);
+                .map(specParser::parse)
+                .forEach(spec -> {
+                    var specDescriptor = new SpecDescriptor(spec.name());
+                    reporter.reportSpecStarted(specDescriptor);
 
-                        var execResult = runner.exec(spec);
-                        if (execResult == ActTestSpecRunner.ActExecResult.PASSED) {
-                            reporter.reportSpecFinishedSuccessfully(specDescriptor);
-                        } else {
-                            failed.set(true);
-                            reporter.reportSpecFinishedWithFailure(specDescriptor);
-                        }
-                    });
+                    var execResult = runner.exec(spec);
+                    if (execResult == ActTestSpecRunner.ActExecResult.PASSED) {
+                        reporter.reportSpecFinishedSuccessfully(specDescriptor);
+                    } else {
+                        failed.set(true);
+                        reporter.reportSpecFinishedWithFailure(specDescriptor);
+                    }
+                });
             reporter.reportTestExecutionFinished();
         } catch (Exception e) {
             throw new ActException(e);
@@ -122,8 +138,8 @@ public abstract class ActTest extends DefaultTask {
     private ActTestSpecRunnerListener createRunnerListener(ActTestReporter reporter) {
         if (forwardActOutput.get()) {
             return new CompositeActTestSpecRunnerListener(List.of(
-                    new OutputForwardingActRunnerListener(getLogger()),
-                    new ReportingActRunnerListener(reporter)
+                new OutputForwardingActRunnerListener(getLogger()),
+                new ReportingActRunnerListener(reporter)
             ));
         } else {
             return new ReportingActRunnerListener(reporter);
@@ -132,11 +148,11 @@ public abstract class ActTest extends DefaultTask {
 
     private List<File> findSpecFiles() {
         return specsRoot.getAsFileTree()
-                .getFiles()
-                .stream()
-                .filter(ActTest::isActSpecFile)
-                .sorted(SPEC_FILE_COMPARATOR)
-                .toList();
+            .getFiles()
+            .stream()
+            .filter(ActTest::isActSpecFile)
+            .sorted(SPEC_FILE_COMPARATOR)
+            .toList();
     }
 
     private static boolean isActSpecFile(File file) {
@@ -146,8 +162,8 @@ public abstract class ActTest extends DefaultTask {
 
     private ActTestSpecParser createSpecParser() {
         return new ActTestSpecParser(
-                workflowsRoot.getAsFile().get().toPath(),
-                specsRoot.getAsFile().get().toPath()
+            workflowsRoot.getAsFile().get().toPath(),
+            specsRoot.getAsFile().get().toPath()
         );
     }
 
@@ -155,8 +171,8 @@ public abstract class ActTest extends DefaultTask {
         var xmlReportFile = reportsDir.file("test.xml").get().getAsFile().toPath();
         var htmlReportFile = reportsDir.file("test.html").get().getAsFile().toPath();
         return new CompositeActTestReporter(List.of(
-                new XmlActTestReporter(xmlReportFile),
-                new HtmlActTestReporter(htmlReportFile)
+            new XmlActTestReporter(xmlReportFile),
+            new HtmlActTestReporter(htmlReportFile)
         ));
     }
 }

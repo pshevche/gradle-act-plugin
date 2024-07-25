@@ -24,3 +24,5 @@ gradle-app.setting
 build
 
 .idea
+
+.kotlin
