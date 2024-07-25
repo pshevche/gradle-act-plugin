@@ -17,14 +17,15 @@ class ActTestVariablesFuncTest : FreeSpec({
 
     "supports setting variables values directly" {
         project.addSpec(
-            "variables_values.act.yml", """
+            "variables_values.act.yml",
+            """
             name: variables values
             workflow: print_variables.yml
             variables:
                 values:
                     GREETING: Hello
                     NAME: Bruce
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")
@@ -40,12 +41,13 @@ class ActTestVariablesFuncTest : FreeSpec({
     "supports setting variables from file" {
         project.addSpecResource("inputs/greeting.variables")
         project.addSpec(
-            "variables_files.act.yml", """
+            "variables_files.act.yml",
+            """
             name: variables file
             workflow: print_variables.yml
             variables:
                 file: inputs/greeting.variables
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")

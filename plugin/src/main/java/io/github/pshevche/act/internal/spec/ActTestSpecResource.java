@@ -4,9 +4,9 @@ import javax.annotation.Nullable;
 import java.nio.file.Path;
 
 public record ActTestSpecResource(
-    boolean enabled,
-    Path storage,
-    @Nullable String host,
-    @Nullable Integer port
+        boolean enabled,
+        Path storage,
+        @Nullable String host,
+        @Nullable Integer port
 ) {
 }

@@ -24,22 +24,23 @@ class HtmlActTestReporterTest : FreeSpec({
         val job2 = JobDescriptor(spec2, "job2")
         val job3 = JobDescriptor(spec2, "job3")
 
-        val report = writeReport {
-            reportTestExecutionStarted()
-            reportSpecStarted(spec1)
-            reportJobStarted(job1)
-            reportJobFinishedOrSkipped(job1, "output1")
-            reportSpecFinishedSuccessfully(spec1)
+        val report =
+            writeReport {
+                reportTestExecutionStarted()
+                reportSpecStarted(spec1)
+                reportJobStarted(job1)
+                reportJobFinishedOrSkipped(job1, "output1")
+                reportSpecFinishedSuccessfully(spec1)
 
-            reportSpecStarted(spec2)
-            reportJobStarted(job2)
-            reportJobFinishedWithFailure(job2, "output2")
-            reportJobStarted(job3)
-            reportSuccessfulJobStep(job3)
-            reportJobFinishedOrSkipped(job3, "output3")
-            reportSpecFinishedWithFailure(spec2)
-            reportTestExecutionFinished()
-        }
+                reportSpecStarted(spec2)
+                reportJobStarted(job2)
+                reportJobFinishedWithFailure(job2, "output2")
+                reportJobStarted(job3)
+                reportSuccessfulJobStep(job3)
+                reportJobFinishedOrSkipped(job3, "output3")
+                reportSpecFinishedWithFailure(spec2)
+                reportTestExecutionFinished()
+            }
 
         val reportHTML = report.readText()
         // job1 is skipped

@@ -36,8 +36,8 @@ public final class ActTestSpecInputYaml {
     @Override
     public String toString() {
         return "ActTestSpecInputYaml[" +
-            "file=" + file + ", " +
-            "values=" + values + ']';
+                "file=" + file + ", " +
+                "values=" + values + ']';
     }
 
 }

@@ -34,8 +34,8 @@ public class ReportingActRunnerListener implements ActTestSpecRunnerListener {
                 reporter.reportJobStarted(jobDescriptor);
             }
             outputByJob.computeIfAbsent(jobDescriptor, __ -> new StringBuilder())
-                .append(line)
-                .append(System.lineSeparator());
+                    .append(line)
+                    .append(System.lineSeparator());
 
             if (line.contains("Success - Main")) {
                 reporter.reportSuccessfulJobStep(jobDescriptor);

@@ -34,8 +34,8 @@ public final class ActTestSpecResourcesYaml {
     @Override
     public String toString() {
         return "ActTestSpecResourcesYaml[" +
-            "artifactServer=" + artifactServer + ", " +
-            "cacheServer=" + cacheServer + ']';
+                "artifactServer=" + artifactServer + ", " +
+                "cacheServer=" + cacheServer + ']';
     }
 
 }

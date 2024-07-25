@@ -21,14 +21,15 @@ class ActTestCacheServerResourceFuncTest : FreeSpec({
     "persists cache entries in configured directory" {
         val cacheServerStorage = project.buildFile.toPath().parent.resolve("cache")
         project.addSpec(
-            "configured_cache_server.act.yml", """
+            "configured_cache_server.act.yml",
+            """
             name: configured cache server
             workflow: save_file_in_cache.yml
             resources:
                 cacheServer:
                     enabled: true
                     storage: ${cacheServerStorage.absolutePathString()}
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.test()
@@ -49,10 +50,11 @@ class ActTestCacheServerResourceFuncTest : FreeSpec({
             tasks.actTest {
                 timeout = java.time.Duration.ofSeconds(10)
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
         project.addSpec(
-            "configured_cache_server.act.yml", """
+            "configured_cache_server.act.yml",
+            """
             name: configured cache server
             workflow: save_file_in_cache.yml
             resources:
@@ -61,7 +63,7 @@ class ActTestCacheServerResourceFuncTest : FreeSpec({
                     storage: ${cacheServerStorage.absolutePathString()}
                     host: 192.168.0.55
                     port: 34568
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.testAndFail("-Dact.forwardOutput=true")

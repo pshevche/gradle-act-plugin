@@ -9,7 +9,10 @@ import javax.xml.stream.XMLEventReader
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
 
-fun parseSpecs(report: File, vararg options: ParseOption): List<ActTestReportSpec> {
+fun parseSpecs(
+    report: File,
+    vararg options: ParseOption,
+): List<ActTestReportSpec> {
     val specs = SpecsParser()
     val reader = createXmlReader(report)
     val eventStack = Stack<XMLEvent>()
@@ -33,14 +36,13 @@ fun parseSpecs(report: File, vararg options: ParseOption): List<ActTestReportSpe
 
 enum class ParseOption {
     INCLUDE_TEST_ID,
-    INCLUDE_TEST_OUTPUT
+    INCLUDE_TEST_OUTPUT,
 }
 
 private fun isContainerFinished(event: XMLEvent) =
     event.isStartElement && event.asStartElement().name.localPart == "finished"
 
-private fun isResultReason(event: XMLEvent) =
-    event.isStartElement && event.asStartElement().name.localPart == "reason"
+private fun isResultReason(event: XMLEvent) = event.isStartElement && event.asStartElement().name.localPart == "reason"
 
 private fun isContainerResult(event: XMLEvent) =
     event.isStartElement && event.asStartElement().name.localPart == "result"
@@ -51,22 +53,28 @@ private fun isContainerStarted(event: XMLEvent) =
 private fun createXmlReader(report: File): XMLEventReader =
     XMLInputFactory.newInstance().createXMLEventReader(FileInputStream(report))
 
-private fun getAttribute(event: XMLEvent, name: String) = event.asStartElement().getAttributeByName(QName(name)).value
+private fun getAttribute(
+    event: XMLEvent,
+    name: String,
+) = event.asStartElement().getAttributeByName(QName(name)).value
 
-private fun <E> Stack<E>.peekTwice(): E = this.let {
-    val top = this.pop()
-    val topParent = this.peek()
-    this.push(top)
-    return topParent
-}
+private fun <E> Stack<E>.peekTwice(): E =
+    this.let {
+        val top = this.pop()
+        val topParent = this.peek()
+        this.push(top)
+        return topParent
+    }
 
 private class SpecsParser {
-
     private val specParsers: MutableList<SpecParser> = mutableListOf()
 
     fun toSpecs(): List<ActTestReportSpec> = specParsers.map { it.toSpec() }
 
-    fun onSpecOrJobStarted(event: XMLEvent, options: Array<out ParseOption>) {
+    fun onSpecOrJobStarted(
+        event: XMLEvent,
+        options: Array<out ParseOption>,
+    ) {
         val containerId = getAttribute(event, "id").toLong()
         val containerName = getAttribute(event, "name")
         if (hasInProgressSpec()) {
@@ -78,13 +86,19 @@ private class SpecsParser {
 
     private fun hasInProgressSpec() = specParsers.isNotEmpty() && currentSpec().isRunning()
 
-    fun onSpecOrJobResult(event: XMLEvent, containerFinishedEvent: XMLEvent) {
+    fun onSpecOrJobResult(
+        event: XMLEvent,
+        containerFinishedEvent: XMLEvent,
+    ) {
         val status = Status.valueOf(getAttribute(event, "status"))
         val containerId = getAttribute(containerFinishedEvent, "id").toLong()
         currentSpec().onSpecOrJobResult(containerId, status)
     }
 
-    fun onJobResultReason(output: String, containerFinishedEvent: XMLEvent) {
+    fun onJobResultReason(
+        output: String,
+        containerFinishedEvent: XMLEvent,
+    ) {
         currentSpec().onJobResultReason(getAttribute(containerFinishedEvent, "id").toLong(), output)
     }
 
@@ -101,24 +115,32 @@ private class SpecParser(private val id: Long, private val name: String, private
     private var status: Status? = null
     private var runningJobs: MutableMap<Long, JobParser> = mutableMapOf()
 
-    fun toSpec(): ActTestReportSpec = ActTestReportSpec(
-        getId(),
-        name,
-        status!!,
-        jobParsers.map { it.toJob() }.toSet()
-    )
+    fun toSpec(): ActTestReportSpec =
+        ActTestReportSpec(
+            getId(),
+            name,
+            status!!,
+            jobParsers.map { it.toJob() }.toSet(),
+        )
 
-    private fun getId() = if (options.contains(ParseOption.INCLUDE_TEST_ID)) {
-        id
-    } else {
-        null
-    }
+    private fun getId() =
+        if (options.contains(ParseOption.INCLUDE_TEST_ID)) {
+            id
+        } else {
+            null
+        }
 
-    fun onJobStarted(jobId: Long, jobName: String) {
+    fun onJobStarted(
+        jobId: Long,
+        jobName: String,
+    ) {
         runningJobs.putIfAbsent(jobId, JobParser(jobId, jobName, this.name, options))
     }
 
-    fun onSpecOrJobResult(containerId: Long, status: Status) {
+    fun onSpecOrJobResult(
+        containerId: Long,
+        status: Status,
+    ) {
         val maybeJob = runningJobs.get(containerId)
         if (maybeJob == null) {
             this.status = status
@@ -127,7 +149,10 @@ private class SpecParser(private val id: Long, private val name: String, private
         }
     }
 
-    fun onJobResultReason(jobId: Long, output: String) {
+    fun onJobResultReason(
+        jobId: Long,
+        output: String,
+    ) {
         runningJobs.getValue(jobId).onResultReason(output)
     }
 
@@ -144,7 +169,7 @@ private class JobParser(
     private val id: Long?,
     private val name: String,
     private val specName: String,
-    private val options: Array<out ParseOption>
+    private val options: Array<out ParseOption>,
 ) {
     private var status: Status? = null
     private var output: String? = null
@@ -159,15 +184,17 @@ private class JobParser(
 
     fun toJob(): ActTestReportJob = ActTestReportJob(getId(), name, specName, status!!, getOutput())
 
-    private fun getOutput() = if (options.contains(ParseOption.INCLUDE_TEST_OUTPUT)) {
-        output!!
-    } else {
-        null
-    }
+    private fun getOutput() =
+        if (options.contains(ParseOption.INCLUDE_TEST_OUTPUT)) {
+            output!!
+        } else {
+            null
+        }
 
-    private fun getId() = if (options.contains(ParseOption.INCLUDE_TEST_ID)) {
-        id
-    } else {
-        null
-    }
+    private fun getId() =
+        if (options.contains(ParseOption.INCLUDE_TEST_ID)) {
+            id
+        } else {
+            null
+        }
 }

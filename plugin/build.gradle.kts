@@ -2,6 +2,7 @@ plugins {
     checkstyle
     idea
     `java-gradle-plugin`
+    alias(libs.plugins.detekt)
     alias(libs.plugins.kotlin)
 }
 
@@ -10,6 +11,8 @@ repositories {
 }
 
 dependencies {
+    detektPlugins(libs.detekt.ktlint)
+
     implementation(libs.open.test.reporting)
     implementation(libs.freemarker)
     implementation(libs.snakeyaml)
@@ -28,7 +31,13 @@ java {
 }
 
 checkstyle {
+    configFile = rootDir.resolve("config/checkstyle.xml")
     maxWarnings = 3
+}
+
+detekt {
+    config.from(rootDir.resolve("config/detekt.yml"))
+    buildUponDefaultConfig = true
 }
 
 tasks.test {

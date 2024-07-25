@@ -22,12 +22,13 @@ class XmlActTestReporterTest : FreeSpec({
 
     "reports a spec with no jobs" {
         val spec = SpecDescriptor("spec")
-        val report = writeReport {
-            reportTestExecutionStarted()
-            reportSpecStarted(spec)
-            reportSpecFinishedSuccessfully(spec)
-            reportTestExecutionFinished()
-        }
+        val report =
+            writeReport {
+                reportTestExecutionStarted()
+                reportSpecStarted(spec)
+                reportSpecFinishedSuccessfully(spec)
+                reportTestExecutionFinished()
+            }
 
         assertEventsPayload(report) {
             spec(1, "spec", SUCCESSFUL)
@@ -40,20 +41,21 @@ class XmlActTestReporterTest : FreeSpec({
         val spec2 = SpecDescriptor("spec2")
         val job2 = JobDescriptor(spec2, "job2")
 
-        val report = writeReport {
-            reportTestExecutionStarted()
-            reportSpecStarted(spec1)
-            reportJobStarted(job1)
-            reportJobFinishedOrSkipped(job1, "job1 output")
-            reportSpecFinishedSuccessfully(spec1)
+        val report =
+            writeReport {
+                reportTestExecutionStarted()
+                reportSpecStarted(spec1)
+                reportJobStarted(job1)
+                reportJobFinishedOrSkipped(job1, "job1 output")
+                reportSpecFinishedSuccessfully(spec1)
 
-            reportSpecStarted(spec2)
-            reportJobStarted(job2)
-            reportSuccessfulJobStep(job2)
-            reportJobFinishedOrSkipped(job2, "job2 output")
-            reportSpecFinishedSuccessfully(spec2)
-            reportTestExecutionFinished()
-        }
+                reportSpecStarted(spec2)
+                reportJobStarted(job2)
+                reportSuccessfulJobStep(job2)
+                reportJobFinishedOrSkipped(job2, "job2 output")
+                reportSpecFinishedSuccessfully(spec2)
+                reportTestExecutionFinished()
+            }
 
         assertEventsPayload(report) {
             spec(1, "spec1", SUCCESSFUL) {
@@ -69,17 +71,18 @@ class XmlActTestReporterTest : FreeSpec({
         val spec = SpecDescriptor("spec")
         val job1 = JobDescriptor(spec, "job1")
         val job2 = JobDescriptor(spec, "job2")
-        val report = writeReport {
-            reportTestExecutionStarted()
-            reportSpecStarted(spec)
-            reportJobStarted(job1)
-            reportJobFinishedWithFailure(job1, "job1 goes boom!")
+        val report =
+            writeReport {
+                reportTestExecutionStarted()
+                reportSpecStarted(spec)
+                reportJobStarted(job1)
+                reportJobFinishedWithFailure(job1, "job1 goes boom!")
 
-            reportJobStarted(job2)
-            reportJobFinishedWithFailure(job2, "job2 goes boom, too!")
-            reportSpecFinishedWithFailure(spec)
-            reportTestExecutionFinished()
-        }
+                reportJobStarted(job2)
+                reportJobFinishedWithFailure(job2, "job2 goes boom, too!")
+                reportSpecFinishedWithFailure(spec)
+                reportTestExecutionFinished()
+            }
 
         assertEventsPayload(report) {
             spec(1, "spec", FAILED) {

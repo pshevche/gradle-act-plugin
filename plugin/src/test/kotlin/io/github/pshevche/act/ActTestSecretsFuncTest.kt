@@ -17,7 +17,8 @@ class ActTestSecretsFuncTest : FreeSpec({
 
     "supports setting secrets values directly" {
         project.addSpec(
-            "secrets_values.act.yml", """
+            "secrets_values.act.yml",
+            """
             name: secrets values
             workflow: print_secrets.yml
             secrets:
@@ -27,7 +28,7 @@ class ActTestSecretsFuncTest : FreeSpec({
             # otherwise, the secrets will be obfuscated
             additionalArgs:
                 - --insecure-secrets
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")
@@ -43,7 +44,8 @@ class ActTestSecretsFuncTest : FreeSpec({
     "supports setting workflow inputs from file" {
         project.addSpecResource("inputs/greeting.secrets")
         project.addSpec(
-            "secrets_files.act.yml", """
+            "secrets_files.act.yml",
+            """
             name: secrets file
             workflow: print_secrets.yml
             secrets:
@@ -51,7 +53,7 @@ class ActTestSecretsFuncTest : FreeSpec({
             # otherwise, the secrets will be obfuscated
             additionalArgs:
                 - --insecure-secrets
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")

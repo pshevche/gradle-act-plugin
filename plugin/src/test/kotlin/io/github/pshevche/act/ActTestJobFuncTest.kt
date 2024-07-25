@@ -14,10 +14,11 @@ class ActTestJobFuncTest : FreeSpec({
     "reports failures for individual jobs" {
         project.addWorkflow("workflow_with_failing_and_passing_jobs")
         project.addSpec(
-            "failing_and_passing_jobs.act.yml", """
+            "failing_and_passing_jobs.act.yml",
+            """
             name: workflow with failing and passing jobs
             workflow: workflow_with_failing_and_passing_jobs.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.testAndFail()
@@ -33,18 +34,20 @@ class ActTestJobFuncTest : FreeSpec({
     "supports selecting single jobs to run" {
         project.addWorkflow("workflow_with_failing_and_passing_jobs")
         project.addSpec(
-            "failing_job.act.yml", """
+            "failing_job.act.yml",
+            """
             name: failing job only
             workflow: workflow_with_failing_and_passing_jobs.yml
             job: failing_job
-        """.trimIndent()
+            """.trimIndent(),
         )
         project.addSpec(
-            "passing_job.act.yml", """
+            "passing_job.act.yml",
+            """
             name: passing job only
             workflow: workflow_with_failing_and_passing_jobs.yml
             job: successful_job
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.testAndFail()

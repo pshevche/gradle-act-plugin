@@ -17,10 +17,11 @@ class ActTestMatrixFuncTest : FreeSpec({
 
     "runs workflow with all matrix values by default" {
         project.addSpec(
-            "matrix_values.act.yml", """
+            "matrix_values.act.yml",
+            """
             name: default values
             workflow: print_matrix_values.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")
@@ -42,13 +43,14 @@ class ActTestMatrixFuncTest : FreeSpec({
 
     "supports restricting matrix values to run with" {
         project.addSpec(
-            "matrix_values.act.yml", """
+            "matrix_values.act.yml",
+            """
             name: default values
             workflow: print_matrix_values.yml
             matrix:
                 greeting: Hello
                 name: Bruce
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")

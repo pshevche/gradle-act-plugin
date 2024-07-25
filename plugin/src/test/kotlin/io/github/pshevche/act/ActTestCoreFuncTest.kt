@@ -23,10 +23,11 @@ class ActTestCoreFuncTest : FreeSpec({
     "spec failures cause task failures" {
         project.addWorkflow("always_failing_workflow")
         project.addSpec(
-            "always_failing.act.yml", """
+            "always_failing.act.yml",
+            """
             name: always failing workflow
             workflow: always_failing_workflow.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.testAndFail()
@@ -36,10 +37,11 @@ class ActTestCoreFuncTest : FreeSpec({
     "is up-to-date" {
         project.addWorkflow("always_passing_workflow")
         project.addSpec(
-            "always_passing.act.yml", """
-                name: always passing workflow
-                workflow: always_passing_workflow.yml
-            """.trimIndent()
+            "always_passing.act.yml",
+            """
+            name: always passing workflow
+            workflow: always_passing_workflow.yml
+            """.trimIndent(),
         )
 
         var result = project.test()
@@ -57,15 +59,16 @@ class ActTestCoreFuncTest : FreeSpec({
                     directory = file("${'$'}{rootDir}/build-cache")
                 }
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         project.addWorkflow("always_passing_workflow")
         project.addSpec(
-            "always_passing.act.yml", """
-                name: always passing workflow
-                workflow: always_passing_workflow.yml
-            """.trimIndent()
+            "always_passing.act.yml",
+            """
+            name: always passing workflow
+            workflow: always_passing_workflow.yml
+            """.trimIndent(),
         )
 
         var result = project.run("clean", "actTest", "--build-cache")
@@ -83,16 +86,18 @@ class ActTestCoreFuncTest : FreeSpec({
         project.addWorkflow("always_passing_workflow")
         project.addWorkflow("always_failing_workflow")
         project.addSpec(
-            "passing.act.yml", """
+            "passing.act.yml",
+            """
             name: always passing workflow
             workflow: always_passing_workflow.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
         project.addSpec(
-            "failing.act.yml", """
+            "failing.act.yml",
+            """
             name: always failing workflow
             workflow: always_failing_workflow.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.testAndFail()
@@ -111,19 +116,21 @@ class ActTestCoreFuncTest : FreeSpec({
         project.addWorkflow("always_passing_workflow")
         project.addWorkflow(
             "always_failing_workflow",
-            project.workflowsRoot.resolve("nested/always_failing_workflow.yml")
+            project.workflowsRoot.resolve("nested/always_failing_workflow.yml"),
         )
         project.addSpec(
-            "passing.act.yml", """
+            "passing.act.yml",
+            """
             name: always passing workflow
             workflow: always_passing_workflow.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
         project.addSpec(
-            "nested/failing.act.yml", """
+            "nested/failing.act.yml",
+            """
             name: always failing workflow
             workflow: nested/always_failing_workflow.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.testAndFail()
@@ -141,16 +148,18 @@ class ActTestCoreFuncTest : FreeSpec({
     "supports both YML and YAML spec extensions" {
         project.addWorkflow("always_passing_workflow")
         project.addSpec(
-            "passing_yml.act.yml", """
+            "passing_yml.act.yml",
+            """
             name: YML spec
             workflow: always_passing_workflow.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
         project.addSpec(
-            "passing_yml.act.yaml", """
+            "passing_yml.act.yaml",
+            """
             name: YAML spec
             workflow: always_passing_workflow.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.test()
@@ -168,14 +177,15 @@ class ActTestCoreFuncTest : FreeSpec({
     withData(
         nameFn = { "output forwarding can be enabled via a system property ($it)" },
         false,
-        true
+        true,
     ) { enabled ->
         project.addWorkflow("always_passing_workflow")
         project.addSpec(
-            "passing.act.yml", """
+            "passing.act.yml",
+            """
             name: always passing workflow
             workflow: always_passing_workflow.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val args = if (enabled) listOf("-Dact.forwardOutput=true") else listOf()
@@ -187,21 +197,22 @@ class ActTestCoreFuncTest : FreeSpec({
     withData(
         nameFn = { "output forwarding can be enabled via task configuration ($it)" },
         false,
-        true
+        true,
     ) { enabled ->
         project.addWorkflow("always_passing_workflow")
         project.addSpec(
-            "passing.act.yml", """
+            "passing.act.yml",
+            """
             name: always passing workflow
             workflow: always_passing_workflow.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
         project.buildFile.appendText(
             """
             tasks.actTest {
                 forwardActOutput = $enabled
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test()
@@ -216,7 +227,7 @@ class ActTestCoreFuncTest : FreeSpec({
                 id('base')
                 id('io.github.pshevche.act')
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
         val result = project.testAndFail()
         result.output shouldContain "property 'specsRoot' doesn't have a configured value"
@@ -229,7 +240,7 @@ class ActTestCoreFuncTest : FreeSpec({
                 id('base')
                 id('io.github.pshevche.act')
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
         project.run("help")
     }
@@ -256,28 +267,30 @@ class ActTestCoreFuncTest : FreeSpec({
                 workflowsRoot = file('${customFailingWorkflowsRoot.absolutePath}')
                 specsRoot = file('${customFailingSpecsRoot.absolutePath}')
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.addWorkflow(
             "always_passing_workflow",
-            customSuccessfulWorkflowsRoot.resolve("always_passing_workflow.yaml")
+            customSuccessfulWorkflowsRoot.resolve("always_passing_workflow.yaml"),
         )
         project.addSpec(
-            customSuccessfulSpecsRoot.resolve("custom.act.yaml"), """
+            customSuccessfulSpecsRoot.resolve("custom.act.yaml"),
+            """
             name: successful spec in custom root
             workflow: always_passing_workflow.yaml
-        """.trimIndent()
+            """.trimIndent(),
         )
         project.addWorkflow(
             "always_failing_workflow",
-            customFailingWorkflowsRoot.resolve("always_failing_workflow.yaml")
+            customFailingWorkflowsRoot.resolve("always_failing_workflow.yaml"),
         )
         project.addSpec(
-            customFailingSpecsRoot.resolve("custom.act.yaml"), """
+            customFailingSpecsRoot.resolve("custom.act.yaml"),
+            """
             name: failing spec in custom root
             workflow: always_failing_workflow.yaml
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.runAndFail("customSuccessfulActTest", "customFailingActTest")
@@ -297,10 +310,11 @@ class ActTestCoreFuncTest : FreeSpec({
     "supports task timeouts" {
         project.addWorkflow("always_passing_workflow")
         project.addSpec(
-            "always_passing.act.yml", """
-                name: always passing workflow
-                workflow: always_passing_workflow.yml
-            """.trimIndent()
+            "always_passing.act.yml",
+            """
+            name: always passing workflow
+            workflow: always_passing_workflow.yml
+            """.trimIndent(),
         )
 
         project.buildFile.appendText(
@@ -308,7 +322,7 @@ class ActTestCoreFuncTest : FreeSpec({
             tasks.actTest {
                 timeout = java.time.Duration.ofMillis(10)
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.testAndFail()
@@ -322,10 +336,11 @@ class ActTestCoreFuncTest : FreeSpec({
     "works with configuration cache" {
         project.addWorkflow("always_passing_workflow")
         project.addSpec(
-            "always_passing.act.yml", """
-                name: always passing workflow
-                workflow: always_passing_workflow.yml
-            """.trimIndent()
+            "always_passing.act.yml",
+            """
+            name: always passing workflow
+            workflow: always_passing_workflow.yml
+            """.trimIndent(),
         )
 
         project.test("--configuration-cache")

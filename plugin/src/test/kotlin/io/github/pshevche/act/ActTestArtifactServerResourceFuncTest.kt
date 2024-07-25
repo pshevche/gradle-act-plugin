@@ -21,14 +21,15 @@ class ActTestArtifactServerResourceFuncTest : FreeSpec({
 
     "artifact server is disabled by default" {
         project.addSpec(
-            "default_artifact_server.act.yml", """
+            "default_artifact_server.act.yml",
+            """
             name: default artifact server
             workflow: save_file_in_artifact_server.yml
             env:
                 values:
                     # required to execute upload-artifact action
                     ACTIONS_RUNTIME_TOKEN: irrelevant
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.testAndFail()
@@ -43,7 +44,8 @@ class ActTestArtifactServerResourceFuncTest : FreeSpec({
     "persists workflow artifacts in configured directory" {
         val artifactServerStorage = project.buildFile.toPath().parent.resolve("artifacts")
         project.addSpec(
-            "configured_artifact_server.act.yml", """
+            "configured_artifact_server.act.yml",
+            """
             name: configured artifact server
             workflow: save_file_in_artifact_server.yml
             resources:
@@ -54,7 +56,7 @@ class ActTestArtifactServerResourceFuncTest : FreeSpec({
                 values:
                     # required to execute upload-artifact action
                     ACTIONS_RUNTIME_TOKEN: irrelevant
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.test()
@@ -71,7 +73,8 @@ class ActTestArtifactServerResourceFuncTest : FreeSpec({
     "artifact server can be explicitly disabled" {
         val artifactServerStorage = project.buildFile.toPath().parent.resolve("artifacts")
         project.addSpec(
-            "disabled_artifact_server.act.yml", """
+            "disabled_artifact_server.act.yml",
+            """
             name: disabled artifact server
             workflow: save_file_in_artifact_server.yml
             resources:
@@ -82,7 +85,7 @@ class ActTestArtifactServerResourceFuncTest : FreeSpec({
                 values:
                     # required to execute upload-artifact action
                     ACTIONS_RUNTIME_TOKEN: irrelevant
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.testAndFail()
@@ -99,7 +102,8 @@ class ActTestArtifactServerResourceFuncTest : FreeSpec({
     "supports advanced server configuration" {
         val artifactServerStorage = project.buildFile.toPath().parent.resolve("artifacts")
         project.addSpec(
-            "configured_artifact_server.act.yml", """
+            "configured_artifact_server.act.yml",
+            """
             name: configured artifact server
             workflow: save_file_in_artifact_server.yml
             resources:
@@ -112,7 +116,7 @@ class ActTestArtifactServerResourceFuncTest : FreeSpec({
                 values:
                     # required to execute upload-artifact action
                     ACTIONS_RUNTIME_TOKEN: irrelevant
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         // I can't figure out how to override these settings to something that will work

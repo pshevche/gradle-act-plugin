@@ -32,10 +32,10 @@ public class XmlActTestReporter extends AbstractActTestReporter {
             Files.createFile(reportFile);
         }
         this.writer = Events.createDocumentWriter(
-            NamespaceRegistry.builder(Namespace.REPORTING_CORE)
-                .add("e", Namespace.REPORTING_EVENTS)
-                .build(),
-            reportFile
+                NamespaceRegistry.builder(Namespace.REPORTING_CORE)
+                        .add("e", Namespace.REPORTING_EVENTS)
+                        .build(),
+                reportFile
         );
     }
 

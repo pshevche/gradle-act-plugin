@@ -148,17 +148,17 @@ public class ActTestSpecYaml {
     @Override
     public String toString() {
         return "ActTestSpecYaml{" +
-            "name='" + name + '\'' +
-            ", workflow='" + workflow + '\'' +
-            ", job='" + job + '\'' +
-            ", event=" + event +
-            ", env=" + env +
-            ", inputs=" + inputs +
-            ", secrets=" + secrets +
-            ", variables=" + variables +
-            ", matrix=" + matrix +
-            ", resources=" + resources +
-            ", additionalArgs=" + additionalArgs +
-            '}';
+                "name='" + name + '\'' +
+                ", workflow='" + workflow + '\'' +
+                ", job='" + job + '\'' +
+                ", event=" + event +
+                ", env=" + env +
+                ", inputs=" + inputs +
+                ", secrets=" + secrets +
+                ", variables=" + variables +
+                ", matrix=" + matrix +
+                ", resources=" + resources +
+                ", additionalArgs=" + additionalArgs +
+                '}';
     }
 }

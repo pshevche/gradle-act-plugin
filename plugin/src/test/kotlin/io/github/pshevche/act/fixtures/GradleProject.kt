@@ -10,7 +10,6 @@ import java.io.File
 import java.nio.file.Files
 
 class GradleProject(private val workspaceDir: File) : BeforeTestListener {
-
     val buildFile by lazy { workspaceDir.resolve("build.gradle") }
     val settingsFile by lazy { workspaceDir.resolve("settings.gradle") }
     val workflowsRoot by lazy { workspaceDir.resolve(".github/workflows") }
@@ -35,11 +34,14 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
                 specsRoot = file('${specsRoot.toPath()}')
             }
             
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
-    fun addWorkflow(workflowName: String, targetLocation: File = workflowsRoot.resolve("${workflowName}.yml")) {
+    fun addWorkflow(
+        workflowName: String,
+        targetLocation: File = workflowsRoot.resolve("$workflowName.yml"),
+    ) {
         Files.createDirectories(targetLocation.toPath().parent)
         copyWorkflowContent(targetLocation, workflowName)
     }
@@ -50,11 +52,17 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
         copyResourceContent(resourceFile, resourceName)
     }
 
-    fun addSpec(filePath: String, content: String) {
+    fun addSpec(
+        filePath: String,
+        content: String,
+    ) {
         addSpec(specsRoot.resolve(filePath), content)
     }
 
-    fun addSpec(specFile: File, content: String) {
+    fun addSpec(
+        specFile: File,
+        content: String,
+    ) {
         Files.createDirectories(specFile.toPath().parent)
         specFile.writeText(content)
     }
@@ -67,17 +75,24 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
 
     fun testAndFail(vararg args: String): BuildResult = runAndFail("actTest", *args)
 
-    fun xmlReport(taskName: String = "actTest") = file("build/reports/act/${taskName}/test.xml")
+    fun xmlReport(taskName: String = "actTest") = file("build/reports/act/$taskName/test.xml")
 
-    private fun copyWorkflowContent(workflowFile: File, workflowName: String) {
-        copyResourceContent(workflowFile, "workflows/${workflowName}.yml")
+    private fun copyWorkflowContent(
+        workflowFile: File,
+        workflowName: String,
+    ) {
+        copyResourceContent(workflowFile, "workflows/$workflowName.yml")
     }
 
-    private fun copyResourceContent(targetFile: File, resourcePath: String) {
-        val resourceContent = this.javaClass.getResourceAsStream("/${resourcePath}")!!
-            .bufferedReader().use { reader ->
-                reader.readText()
-            }
+    private fun copyResourceContent(
+        targetFile: File,
+        resourcePath: String,
+    ) {
+        val resourceContent =
+            this.javaClass.getResourceAsStream("/$resourcePath")!!
+                .bufferedReader().use { reader ->
+                    reader.readText()
+                }
 
         targetFile.bufferedWriter().use { writer ->
             writer.write(resourceContent)
@@ -96,6 +111,5 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
             .withProjectDir(workspaceDir)
             .withDebug(true)
 
-    private fun file(path: String): File =
-        workspaceDir.toPath().resolve(path).toFile()
+    private fun file(path: String): File = workspaceDir.toPath().resolve(path).toFile()
 }

@@ -17,14 +17,15 @@ class ActTestInputsFuncTest : FreeSpec({
 
     "supports setting workflow input values directly" {
         project.addSpec(
-            "input_values.act.yml", """
+            "input_values.act.yml",
+            """
             name: input values
             workflow: print_inputs.yml
             inputs:
                 values:
                     greeting: Hello
                     name: Bruce
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")
@@ -40,12 +41,13 @@ class ActTestInputsFuncTest : FreeSpec({
     "supports setting workflow inputs from file" {
         project.addSpecResource("inputs/greeting.input")
         project.addSpec(
-            "inputs_file.act.yml", """
+            "inputs_file.act.yml",
+            """
             name: inputs file
             workflow: print_inputs.yml
             inputs:
                 file: inputs/greeting.input
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")

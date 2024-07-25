@@ -18,10 +18,11 @@ class ActTestEventFuncTest : FreeSpec({
 
     "uses the first event type lexicographically from workflow if no event type is set" {
         project.addSpec(
-            "default_event.act.yml", """
+            "default_event.act.yml",
+            """
             name: picks first event type if unspecified
             workflow: print_issue_or_pr_title.yml
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.test()
@@ -36,12 +37,13 @@ class ActTestEventFuncTest : FreeSpec({
 
     "allows configuring the event type to trigger the workflow with" {
         project.addSpec(
-            "custom_event.act.yml", """
+            "custom_event.act.yml",
+            """
             name: picks provided event type
             workflow: print_issue_or_pr_title.yml
             event:
                 type: pull_request
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         project.test()
@@ -57,12 +59,13 @@ class ActTestEventFuncTest : FreeSpec({
     "allows providing the payload for the default event type" {
         project.addSpecResource("events/issue_payload.json")
         project.addSpec(
-            "default_event_custom_payload.act.yml", """
+            "default_event_custom_payload.act.yml",
+            """
             name: uses provided payload for default event
             workflow: print_issue_or_pr_title.yml
             event:
                 payload: events/issue_payload.json
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")
@@ -79,13 +82,14 @@ class ActTestEventFuncTest : FreeSpec({
     "allows configuring both the event type and its payload" {
         project.addSpecResource("events/pull_request_payload.json")
         project.addSpec(
-            "custom_event_custom_payload.act.yml", """
+            "custom_event_custom_payload.act.yml",
+            """
             name: uses provided event type and payload
             workflow: print_issue_or_pr_title.yml
             event:
                 type: pull_request
                 payload: events/pull_request_payload.json
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")

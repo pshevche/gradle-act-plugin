@@ -17,14 +17,15 @@ class ActTestEnvFuncTest : FreeSpec({
 
     "supports setting environment variable values directly" {
         project.addSpec(
-            "env_values.act.yml", """
+            "env_values.act.yml",
+            """
             name: env values
             workflow: print_env_variables.yml
             env:
                 values:
                     GREETING: Hello
                     NAME: Bruce
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")
@@ -40,12 +41,13 @@ class ActTestEnvFuncTest : FreeSpec({
     "supports setting environment variables from file" {
         project.addSpecResource("inputs/greeting.env")
         project.addSpec(
-            "env_file.act.yml", """
+            "env_file.act.yml",
+            """
             name: env file
             workflow: print_env_variables.yml
             env:
                 file: inputs/greeting.env
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val result = project.test("-Dact.forwardOutput=true")
