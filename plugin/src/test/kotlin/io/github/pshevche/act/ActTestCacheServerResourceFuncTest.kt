@@ -43,6 +43,12 @@ class ActTestCacheServerResourceFuncTest : FreeSpec({
 
     "supports advanced cache configuration" {
         val cacheServerStorage = project.buildFile.toPath().parent.resolve("cache")
+        // custom configuration is invalid and can sometimes cause act to hang
+        project.buildFile.appendText("""
+            tasks.actTest {
+                timeout = java.time.Duration.ofSeconds(10)
+            }
+        """.trimIndent())
         project.addSpec(
             "configured_cache_server.act.yml", """
             name: configured cache server
@@ -52,11 +58,11 @@ class ActTestCacheServerResourceFuncTest : FreeSpec({
                     enabled: true
                     storage: ${cacheServerStorage.absolutePathString()}
                     host: 192.168.0.55
-                    port: 12345
+                    port: 34568
         """.trimIndent()
         )
 
         val result = project.testAndFail("-Dact.forwardOutput=true")
-        result.output shouldContain "Resource Url: http://192.168.0.55:12345"
+        result.output shouldContain "Resource Url: http://192.168.0.55:34568"
     }
 })

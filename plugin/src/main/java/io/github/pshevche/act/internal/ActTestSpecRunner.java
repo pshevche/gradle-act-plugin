@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class ActTestSpecRunner {
@@ -32,15 +34,29 @@ public class ActTestSpecRunner {
 
     public ActExecResult exec(ActTestSpec spec) {
         try {
-            var exitCode = executeSpecWithListenerNotification(spec).waitFor();
-            return exitCode == 0 ? ActExecResult.PASSED : ActExecResult.FAILED;
+            return execSpecInterruptibly(spec).get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        } catch (Exception e) {
+        } catch (ExecutionException e) {
             return ActExecResult.FAILED;
         }
 
         return ActExecResult.FAILED;
+    }
+
+    private CompletableFuture<ActExecResult> execSpecInterruptibly(ActTestSpec spec) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return executeSpecWithListenerNotification(spec).waitFor() == 0
+                        ? ActExecResult.PASSED
+                        : ActExecResult.FAILED;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } catch (IOException e) {
+                return ActExecResult.FAILED;
+            }
+            return ActExecResult.FAILED;
+        });
     }
 
     private Process executeSpecWithListenerNotification(ActTestSpec spec) throws IOException {

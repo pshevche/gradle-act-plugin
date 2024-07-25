@@ -268,4 +268,24 @@ class ActTestCoreFuncTest : FreeSpec({
             }
         }
     }
+
+    "supports task timeouts" {
+        project.addWorkflow("always_passing_workflow")
+        project.addSpec(
+            "always_passing.act.yml", """
+                name: always passing workflow
+                workflow: always_passing_workflow.yml
+            """.trimIndent()
+        )
+
+        project.buildFile.appendText("""
+            tasks.actTest {
+                timeout = java.time.Duration.ofMillis(10)
+            }
+        """.trimIndent())
+
+        val result = project.testAndFail()
+
+        result.output shouldContain "Timeout has been exceeded"
+    }
 })
