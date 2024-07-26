@@ -9,7 +9,7 @@ develocity {
         termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
         termsOfUseAgree = "yes"
         publishing.onlyIf {
-            it.buildResult.failures.isNotEmpty()
+            providers.environmentVariable("CI").isPresent || it.buildResult.failures.isNotEmpty()
         }
     }
 }
