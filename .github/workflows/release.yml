@@ -1,6 +1,6 @@
-name: Verify on push
+name: Release to Plugins Portal
 
-on: push
+on: workflow_dispatch
 
 jobs:
   build:
@@ -22,3 +22,8 @@ jobs:
           echo "-P ubuntu-latest=node:16-buster-slim" > $HOME/.actrc
       - name: Build
         run: ./gradlew build
+      - name: Publish to Plugins portal
+        env:
+          PGP_SIGNING_KEY: ${{secrets.PGP_SIGNING_KEY}}
+          PGP_SIGNING_KEY_PASSPHRASE: ${{secrets.PGP_SIGNING_KEY_PASSPHRASE}}
+        run: ./gradlew publishPlugins -Pgradle.publish.key=${{secrets.PLUGINS_PORTAL_KEY}} -Pgradle.publish.secret=${{secrets.PLUGIN_PORTAL_SECRET}}
