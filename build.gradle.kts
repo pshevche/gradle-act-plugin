@@ -4,6 +4,8 @@ plugins {
     `java-gradle-plugin`
     alias(libs.plugins.detekt)
     alias(libs.plugins.kotlin)
+    alias(libs.plugins.publish)
+    signing
 }
 
 repositories {
@@ -44,9 +46,24 @@ tasks.test {
     useJUnitPlatform()
 }
 
+group = "io.github.pshevche"
+version = "1.0"
 gradlePlugin {
-    val act by plugins.creating {
+    website = "https://github.com/pshevche/gradle-act-plugin"
+    vcsUrl = "https://github.com/pshevche/gradle-act-plugin.git"
+    plugins.create("act") {
         id = "io.github.pshevche.act"
+        displayName = "Plugin for validating GitHub workflows locally using 'nektos/act' runner"
+        description = "Plugin for validating GitHub workflows locally using 'nektos/act' runner"
+        tags = listOf("github", "github-workflow", "github-actions", "testing", "act")
         implementationClass = "io.github.pshevche.act.ActPlugin"
     }
+}
+
+signing {
+    isRequired = providers.environmentVariable("CI").isPresent
+    useInMemoryPgpKeys(
+        providers.environmentVariable("PGP_SIGNING_KEY").orNull,
+        providers.environmentVariable("PGP_SIGNING_KEY_PASSPHRASE").orNull
+    )
 }
