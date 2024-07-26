@@ -1,4 +1,4 @@
-name: Release to Plugins Portal
+name: Release to Gradle Plugin Portal
 
 on: workflow_dispatch
 
