@@ -32,12 +32,16 @@ object RetryExtension : TestCaseExtension {
     }
 
     override suspend fun intercept(testCase: TestCase, execute: suspend (TestCase) -> TestResult): TestResult {
-        return execute(
-            testCase.copy(test = {
-                retry(config) {
-                    testCase.test(this)
-                }
-            })
-        )
+        if (System.getenv("CI")?.toBoolean() == true) {
+            return execute(
+                testCase.copy(test = {
+                    retry(config) {
+                        testCase.test(this)
+                    }
+                })
+            )
+        } else {
+            return execute(testCase)
+        }
     }
 }

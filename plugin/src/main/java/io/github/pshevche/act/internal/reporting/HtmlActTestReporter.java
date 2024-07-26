@@ -23,7 +23,6 @@ import freemarker.template.Version;
 import io.github.pshevche.act.internal.ActException;
 import io.github.pshevche.act.internal.TestDescriptor;
 import io.github.pshevche.act.internal.TestDescriptor.SpecDescriptor;
-import org.apache.groovy.util.Maps;
 import org.opentest4j.reporting.events.core.Result.Status;
 
 import javax.annotation.Nullable;
@@ -33,6 +32,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class HtmlActTestReporter extends AbstractActTestReporter {
@@ -58,7 +58,7 @@ public class HtmlActTestReporter extends AbstractActTestReporter {
 
     @Override
     public void reportTestExecutionFinished() {
-        var templateInputs = Maps.of(
+        var templateInputs = Map.of(
             "execution", new ExecutionSummary(
                 specs.size(),
                 specs.stream().mapToLong(it -> it.jobs.size()).sum(),

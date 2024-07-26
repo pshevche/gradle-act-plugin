@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.util.GradleVersion
 import java.io.File
 import java.nio.file.Files
 
@@ -83,9 +84,11 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
         specFile.writeText(content)
     }
 
-    fun run(vararg args: String) = runner(*args).build()
+    fun test(gradleVersion: GradleVersion, vararg args: String) = runner(gradleVersion, *args).build()
 
-    fun runAndFail(vararg args: String) = runner(*args).buildAndFail()
+    fun run(vararg args: String) = runner(GradleVersion.current(), *args).build()
+
+    fun runAndFail(vararg args: String) = runner(GradleVersion.current(), *args).buildAndFail()
 
     fun test(vararg args: String): BuildResult = run("actTest", *args)
 
@@ -119,13 +122,14 @@ class GradleProject(private val workspaceDir: File) : BeforeTestListener {
         workspaceDir.listFiles()?.forEach { it.deleteRecursively() }
     }
 
-    private fun runner(vararg args: String): GradleRunner =
+    private fun runner(gradleVersion: GradleVersion, vararg args: String): GradleRunner =
         GradleRunner.create()
             .forwardOutput()
             .withPluginClasspath()
             .withArguments(args.toList())
             .withProjectDir(workspaceDir)
             .withDebug(true)
+            .withGradleVersion(gradleVersion.version)
 
     private fun file(path: String): File = workspaceDir.toPath().resolve(path).toFile()
 }
