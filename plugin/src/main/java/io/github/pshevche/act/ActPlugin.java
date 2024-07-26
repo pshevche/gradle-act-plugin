@@ -24,9 +24,18 @@ import org.gradle.api.Project;
  */
 @SuppressWarnings("unused")
 public class ActPlugin implements Plugin<Project> {
+
+    /**
+     * Plugin application will register a default task {@code actTest} of type {@link ActTest},
+     * which will execute all specification files defined in {@link ActExtension#getSpecsRoot()}.
+     * <p>
+     * The configuration of the default task should be done using the registered project extension of type {@link ActExtension}.
+     */
     public void apply(Project project) {
         var actExtension = project.getExtensions().create("act", ActExtension.class);
         project.getTasks().register("actTest", ActTest.class, task -> {
+            task.setGroup("Verification");
+            task.setDescription("Executes GitHub workflows using 'nektos/act' according to the provided specification files");
             task.getWorkflowsRoot().set(actExtension.getWorkflowsRoot());
             task.getSpecsRoot().set(actExtension.getSpecsRoot());
         });

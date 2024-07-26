@@ -46,6 +46,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
+/**
+ * Executes GitHub workflows using <a href="https://github.com/nektos/act">nektos/act</a> according to the provided
+ * specification files.
+ */
 @CacheableTask
 public abstract class ActTest extends DefaultTask {
 
@@ -71,23 +75,37 @@ public abstract class ActTest extends DefaultTask {
         return getProject().getLayout().getBuildDirectory();
     }
 
+    /**
+     * The directory containing all workflow files referenced by specification files.
+     */
     @InputDirectory
     @PathSensitive(PathSensitivity.RELATIVE)
     public DirectoryProperty getWorkflowsRoot() {
         return workflowsRoot;
     }
 
+    /**
+     * Directory containing specification files.
+     * Specification files should end with *.act.yml or *.act.yaml.
+     * Specification files from nested directories will also be discovered.
+     */
     @InputDirectory
     @PathSensitive(PathSensitivity.RELATIVE)
     public DirectoryProperty getSpecsRoot() {
         return specsRoot;
     }
 
+    /**
+     * When {@code true}, {@code act} output will be forwarded to the standard output.
+     */
     @Internal
     public Property<Boolean> getForwardActOutput() {
         return forwardActOutput;
     }
 
+    /**
+     * Directory in which XML and HTML test reports will be generated.
+     */
     @OutputDirectory
     public DirectoryProperty getReportsDir() {
         return reportsDir;
