@@ -1,5 +1,14 @@
 = Gradle Act Plugin
 
+[.float-group]
+--
+[.left]
+image::https://github.com/pshevche/gradle-act-plugin/actions/workflows/build.yml/badge.svg[link=https://github.com/pshevche/gradle-act-plugin/actions/workflows/build.yml]
+
+[.left]
+image::https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/io/github/pshevche/act/io.github.pshevche.act.gradle.plugin/maven-metadata.xml.svg?colorB=007ec6&label=Gradle Plugin Portal[https://plugins.gradle.org/plugin/io.github.pshevche.act]
+--
+
 **Provides a convenient wrapper plugin over the https://github.com/nektos/act[act] project.**
 
 The plugin defines an opinionated specification format for validating GitHub workflows locally using the https://github.com/nektos/act[act] runner.
@@ -9,9 +18,9 @@ Configured validation tasks execute specified GitHub workflows according to the 
 == Table of content
 
 * <<getting_started, Getting started>>
-  ** <<compatibility, Minimal supported versions>>
-  ** <<apply_plugin, Apply plugin>>
-  ** <<minimal_configuration, Minimal configuration>>
+** <<compatibility, Minimal supported versions>>
+** <<apply_plugin, Apply plugin>>
+** <<minimal_configuration, Minimal configuration>>
 * <<specification_format, Specification format>>
 * <<custom_task, Defining custom validation tasks>>
 * <<reporting, Reporting>>
@@ -23,6 +32,7 @@ Configured validation tasks execute specified GitHub workflows according to the 
 
 [[compatibility]]
 === Minimal supported versions
+
 Minimal supported Gradle version: `7.4`
 
 Minimal supported Java version: `11`
@@ -31,6 +41,7 @@ Minimal supported Java version: `11`
 === Apply plugin
 
 _build.gradle.kts_
+
 [source,kotlin]
 ----
 plugins {
@@ -160,6 +171,7 @@ additionalArgs:
 In addition to the default `actTest` task, custom validation tasks can be defined as follows:
 
 _build.gradle.kts_
+
 [source,kotlin]
 ----
 import io.github.pshevche.act.ActTest
@@ -200,7 +212,8 @@ Despite having this option, feel free to submit a feature request for a new opti
 
 [[useful_links]]
 == Useful links
+
 * https://github.com/nektos/act[nektos/act]: GitHub actions runner used by the plugin.
 * https://nektosact.com/[act User Guide]: describes various configuration options that the runner provides, as well as the format for input files.
 * https://github.com/ota4j-team/open-test-reporting[Open Test Reporting format]: contains the schema for XML reports that can be referenced for automation development.
-* https://plugins.gradle.org/plugin/io.github.pshevche.act[Gradle Act Plugin]: Gradle Act Plugin on Gradle Plugins Portal.
+* https://plugins.gradle.org/plugin/io.github.pshevche.act[Gradle Act Plugin]: Gradle Act Plugin on Gradle Plugin Portal.
