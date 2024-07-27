@@ -67,3 +67,7 @@ signing {
         providers.environmentVariable("PGP_SIGNING_KEY_PASSPHRASE").orNull
     )
 }
+
+tasks.publishPlugins {
+    dependsOn(tasks.build)
+}

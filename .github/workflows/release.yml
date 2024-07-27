@@ -20,8 +20,6 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash -s -- -b "/usr/bin"
           # Use the micro image to speed up tests: https://nektosact.com/usage/runners.html          
           echo "-P ubuntu-latest=node:16-buster-slim" > $HOME/.actrc
-      - name: Build
-        run: ./gradlew build
       - name: Publish to Plugins portal
         env:
           PGP_SIGNING_KEY: ${{secrets.PGP_SIGNING_KEY}}
