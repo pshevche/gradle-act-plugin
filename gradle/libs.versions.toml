@@ -1,7 +1,7 @@
 [versions]
 detekt = "1.23.6"
 freemarker = "2.3.33"
-junit-jupiter = "5.10.3"
+junit-jupiter = "5.11.0"
 junit-platform = "1.11.0"
 kotest = "5.9.1"
 kotlin = "2.0.10"
