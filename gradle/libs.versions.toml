@@ -7,7 +7,7 @@ kotest = "5.9.1"
 kotlin = "2.0.20"
 open-test-reporting = "0.1.0-M2"
 publish = "1.2.1"
-yaml = "2.2"
+yaml = "2.3"
 
 [libraries]
 detekt-ktlint = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
