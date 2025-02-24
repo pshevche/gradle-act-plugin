@@ -1,5 +1,5 @@
 [versions]
-detekt = "1.23.7"
+detekt = "1.23.8"
 freemarker = "2.3.34"
 junit-jupiter = "5.11.4"
 junit-platform = "1.11.4"
